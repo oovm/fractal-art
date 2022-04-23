@@ -1,11 +1,18 @@
 {
+    "name": "lsystem-workspace",
     "private": true,
     "scripts": {
         "build": "cargo build --release",
+        "build:rs": "cargo build --release",
+        "build:web": "pnpm --filter homepage build",
         "test": "cargo test --release",
+        "test:rs": "cargo test --release",
+        "test:web": "pnpm --filter homepage check",
         "fmt": "cargo fmt --all",
-        "push": "wee test && git push",
+        "fmt:rs": "cargo fmt --all",
+        "dev:web": "pnpm --filter homepage dev",
+        "push": "cargo test --release && git push",
         "reset": "git reset Head~ --soft",
-        "pub": "cargo-publish-all --yes --allow-dirty",
+        "u": "cargo upgrade --offline --incompatible"
     }
 }

@@ -1,11 +1,11 @@
 [package]
-name = "sub_projects"
+name = "lsystem"
 publish = false
 version = "0.0.0"
 authors = ["Aster <192607617@qq.com>"]
-description = "..."
-repository = "..."
-readme = "Readme.md"
+description = "Lindenmayer system string rewriting"
+repository = "https://github.com/oovm/LSystem"
+readme = "../../../Readme.md"
 license = "MPL-2.0"
 edition = "2021"
 
@@ -15,7 +15,3 @@ edition = "2021"
 
 [features]
 default = []
-
-[package.metadata.wee]
-t = "cargo test"
-p = "cargo publish --allow-dirty"

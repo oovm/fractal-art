@@ -1,0 +1,19 @@
+{
+    "name": "homepage",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "description": "L-System demo site — VMZ host shell",
+    "scripts": {
+        "check": "vmz check .",
+        "dev": "vmz dev .",
+        "build": "vmz build . --release --profile static",
+        "clean": "rimraf dist"
+    },
+    "devDependencies": {
+        "@vmz/core": "0.1.32",
+        "@vmz/ui": "0.1.32",
+        "@vmz/vmz": "0.1.32",
+        "rimraf": "^6.0.1"
+    }
+}

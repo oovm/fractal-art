@@ -1,0 +1,185 @@
+<template>
+  <section class="turtle">
+    <div class="toolbar">
+      <label>
+        Iterations
+        <input type="number" min="1" max="5" :value="iterations" @input="onIterInput" />
+      </label>
+      <Button type="button" @click="grow">Grow</Button>
+      <Button type="button" variant="ghost" @click="reset">Reset</Button>
+    </div>
+    <p class="status">{{ status }}</p>
+    <svg class="canvas" :viewBox="viewBox" role="img" aria-label="L-system turtle path">
+      <polyline class="stroke" fill="none" :points="polyline" />
+    </svg>
+    <p class="meta">String length: {{ sourceLength }}</p>
+  </section>
+</template>
+
+<style>
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+.canvas {
+  display: block;
+  width: min(100%, 28rem);
+  height: 18rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+.stroke {
+  stroke: #166534;
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.status,
+.meta {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+</style>
+
+<script client>
+type RewriteRule = { from: string; to: string };
+type Point = { x: number; y: number };
+
+const PLANT_RULES: RewriteRule[] = [{ from: "F", to: "FF+[+F-F-F]-[-F+F+F]" }];
+
+function rewrite(axiom: string, rules: RewriteRule[], iterations: number): string {
+  let current = axiom;
+  for (let i = 0; i < iterations; i++) {
+    let next = "";
+    for (const ch of current) {
+      const rule = rules.find((item) => item.from === ch);
+      next += rule ? rule.to : ch;
+    }
+    current = next;
+  }
+  return current;
+}
+
+function turtlePath(source: string, step: number, turnDegrees: number): Point[] {
+  const rad = (turnDegrees * Math.PI) / 180;
+  let x = 0;
+  let y = 0;
+  let heading = -Math.PI / 2;
+  const stack: Array<{ x: number; y: number; heading: number }> = [];
+  const points: Point[] = [{ x, y }];
+
+  for (const ch of source) {
+    if (ch === "F" || ch === "G") {
+      x += Math.cos(heading) * step;
+      y += Math.sin(heading) * step;
+      points.push({ x, y });
+      continue;
+    }
+    if (ch === "+") {
+      heading += rad;
+      continue;
+    }
+    if (ch === "-") {
+      heading -= rad;
+      continue;
+    }
+    if (ch === "[") {
+      stack.push({ x, y, heading });
+      continue;
+    }
+    if (ch === "]") {
+      const frame = stack.pop();
+      if (!frame) continue;
+      x = frame.x;
+      y = frame.y;
+      heading = frame.heading;
+      points.push({ x, y });
+    }
+  }
+  return points;
+}
+
+function pointsToPolyline(points: Point[], padding = 16): { points: string; viewBox: string } {
+  if (points.length === 0) {
+    return { points: "", viewBox: "0 0 100 100" };
+  }
+  let minX = points[0].x;
+  let minY = points[0].y;
+  let maxX = points[0].x;
+  let maxY = points[0].y;
+  for (const p of points) {
+    if (p.x < minX) minX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y > maxY) maxY = p.y;
+  }
+  const width = Math.max(maxX - minX, 1);
+  const height = Math.max(maxY - minY, 1);
+  const serialized = points
+    .map((p) => `${(p.x - minX + padding).toFixed(2)},${(p.y - minY + padding).toFixed(2)}`)
+    .join(" ");
+  return {
+    points: serialized,
+    viewBox: `0 0 ${(width + padding * 2).toFixed(2)} ${(height + padding * 2).toFixed(2)}`,
+  };
+}
+
+function snapshot(iterations: number) {
+  const source = rewrite("F", PLANT_RULES, iterations);
+  const drawn = pointsToPolyline(turtlePath(source, 8, 25));
+  return {
+    source,
+    polyline: drawn.points,
+    viewBox: drawn.viewBox,
+    sourceLength: source.length,
+    status: `Generation ${iterations}.`,
+  };
+}
+
+const first = snapshot(3);
+
+export default class TurtlePanel {
+  iterations = 3;
+  source = first.source;
+  polyline = first.polyline;
+  viewBox = first.viewBox;
+  status = first.status;
+  sourceLength = first.sourceLength;
+
+  draw() {
+    const source = rewrite("F", PLANT_RULES, this.iterations);
+    const path = turtlePath(source, 8, 25);
+    const drawn = pointsToPolyline(path);
+    this.source = source;
+    this.polyline = drawn.points;
+    this.viewBox = drawn.viewBox;
+    this.sourceLength = source.length;
+    this.status = `Generation ${this.iterations}.`;
+  }
+
+  onIterInput(event: Event) {
+    const target = event.target as HTMLInputElement | null;
+    if (!target) return;
+    const next = Number.parseInt(target.value, 10);
+    if (!Number.isFinite(next) || next < 1 || next > 5) return;
+    this.iterations = next;
+    this.draw();
+  }
+
+  grow() {
+    if (this.iterations < 5) {
+      this.iterations += 1;
+    }
+    this.draw();
+  }
+
+  reset() {
+    this.iterations = 1;
+    this.draw();
+  }
+}
+</script>

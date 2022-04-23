@@ -1,10 +1,12 @@
 [workspace]
-members = ["projects/*"]
+members = ["projects/crates/*"]
 default-members = [
-    "projects/sub_projects",
+    "projects/crates/lsystem",
 ]
+
 exclude = [
     "projects/.DS_Store",
+    "projects/packages",
 ]
 
 [profile.release]

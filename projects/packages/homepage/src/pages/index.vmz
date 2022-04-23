@@ -1,0 +1,11 @@
+<template>
+  <AppShell brand="L-System" home-href="/" nav-label="Turtle">
+    <Card title="Lindenmayer turtle" description="Rewrite an axiom, then stroke F as a turtle path.">
+      <TurtlePanel />
+    </Card>
+  </AppShell>
+</template>
+
+<script client>
+export default class IndexPage {}
+</script>
