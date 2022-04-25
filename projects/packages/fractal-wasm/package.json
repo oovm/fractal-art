@@ -1,0 +1,25 @@
+{
+    "name": "@doki-land/fractal-wasm",
+    "version": "0.0.0",
+    "description": "WASM platform package for @doki-land/fractal (Node lib/ + browser lib-web/)",
+    "type": "module",
+    "license": "MPL-2.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/oovm/fractal-art.git"
+    },
+    "main": "./index.js",
+    "types": "./index.d.ts",
+    "files": [
+        "index.js",
+        "index.d.ts",
+        "lib",
+        "lib-web"
+    ],
+    "engines": {
+        "node": ">=18"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

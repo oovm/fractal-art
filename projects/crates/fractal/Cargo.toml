@@ -1,10 +1,10 @@
 [package]
-name = "lsystem"
+name = "fractal"
 publish = false
 version = "0.0.0"
 authors = ["Aster <192607617@qq.com>"]
-description = "Lindenmayer system string rewriting"
-repository = "https://github.com/oovm/LSystem"
+description = "Lindenmayer / turtle fractal core (string rewrite + path)"
+repository = "https://github.com/oovm/fractal-art"
 readme = "../../../Readme.md"
 license = "MPL-2.0"
 edition = "2021"

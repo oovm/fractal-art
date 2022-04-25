@@ -3,12 +3,15 @@
     "version": "0.1.0",
     "private": true,
     "type": "module",
-    "description": "L-System demo site — VMZ host shell",
+    "description": "Fractal demo site — VMZ host shell over @doki-land/fractal WASM",
     "scripts": {
         "check": "vmz check .",
         "dev": "vmz dev .",
         "build": "vmz build . --release --profile static",
         "clean": "rimraf dist"
+    },
+    "dependencies": {
+        "@doki-land/fractal": "workspace:*"
     },
     "devDependencies": {
         "@vmz/core": "0.1.32",

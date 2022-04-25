@@ -12,7 +12,12 @@ time-travel.*
 # Node
 node_modules/
 
-# Rust / VMZ
+# Rust / VMZ / WASM
 dist/
 target/
 Cargo.lock
+projects/crates/fractal-wasm/pkg-node/
+projects/crates/fractal-wasm/pkg-web/
+projects/packages/fractal-wasm/lib/
+projects/packages/fractal-wasm/lib-web/
+projects/packages/homepage/public/wasm/

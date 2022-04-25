@@ -1,0 +1,22 @@
+[package]
+name = "fractal-wasm"
+publish = false
+version = "0.0.0"
+authors = ["Aster <192607617@qq.com>"]
+description = "WASM bindings for @doki-land/fractal"
+repository = "https://github.com/oovm/fractal-art"
+license = "MPL-2.0"
+license-file = "../../../License.md"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+fractal = { path = "../fractal" }
+wasm-bindgen = "0.2.100"
+serde = { version = "1", features = ["derive"] }
+serde-wasm-bindgen = "0.6"
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false

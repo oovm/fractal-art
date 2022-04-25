@@ -1,6 +1,6 @@
 <template>
-  <AppShell brand="L-System" home-href="/" nav-label="Turtle">
-    <Card title="Lindenmayer turtle" description="Rewrite an axiom, then stroke F as a turtle path.">
+  <AppShell brand="Fractal" home-href="/" nav-label="Turtle">
+    <Card title="Lindenmayer turtle" description="Heavy rewrite runs in Rust WASM (`@doki-land/fractal` / `@doki-land/fractal-wasm`).">
       <TurtlePanel />
     </Card>
   </AppShell>

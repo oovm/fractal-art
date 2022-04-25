@@ -1,7 +1,8 @@
 [workspace]
+resolver = "2"
 members = ["projects/crates/*"]
 default-members = [
-    "projects/crates/lsystem",
+    "projects/crates/fractal",
 ]
 
 exclude = [

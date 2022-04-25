@@ -1,18 +1,25 @@
 {
-    "name": "lsystem-workspace",
+    "name": "fractal-art-workspace",
     "private": true,
+    "packageManager": "pnpm@11.24.0",
     "scripts": {
-        "build": "cargo build --release",
-        "build:rs": "cargo build --release",
-        "build:web": "pnpm --filter homepage build",
-        "test": "cargo test --release",
-        "test:rs": "cargo test --release",
+        "build": "cargo build --release -p fractal",
+        "build:rs": "cargo build --release -p fractal",
+        "build:wasm": "node scripts/build-wasm.mjs",
+        "build:web": "pnpm build:wasm && pnpm --filter homepage build",
+        "test": "cargo test --release -p fractal",
+        "test:rs": "cargo test --release -p fractal",
+        "test:wasm": "pnpm build:wasm && node scripts/smoke-fractal.mjs",
         "test:web": "pnpm --filter homepage check",
         "fmt": "cargo fmt --all",
         "fmt:rs": "cargo fmt --all",
         "dev:web": "pnpm --filter homepage dev",
-        "push": "cargo test --release && git push",
+        "push": "cargo test --release -p fractal && git push",
         "reset": "git reset Head~ --soft",
         "u": "cargo upgrade --offline --incompatible"
+    },
+    "devDependencies": {
+        "@doki-land/fractal": "workspace:*",
+        "@doki-land/fractal-wasm": "workspace:*"
     }
 }
