@@ -5,10 +5,12 @@
     "scripts": {
         "build": "cargo build --release -p fractal",
         "build:rs": "cargo build --release -p fractal",
+        "build:napi": "node scripts/build-napi.mjs",
         "build:wasm": "node scripts/build-wasm.mjs",
         "build:web": "pnpm build:wasm && pnpm --filter homepage build",
         "test": "cargo test --release -p fractal",
         "test:rs": "cargo test --release -p fractal",
+        "test:napi": "pnpm build:napi && node scripts/smoke-fractal.mjs",
         "test:wasm": "pnpm build:wasm && node scripts/smoke-fractal.mjs",
         "test:web": "pnpm --filter homepage check",
         "fmt": "cargo fmt --all",
@@ -20,6 +22,7 @@
     },
     "devDependencies": {
         "@doki-land/fractal": "workspace:*",
-        "@doki-land/fractal-win32-x64": "workspace:*"
+        "@doki-land/fractal-win32-x64": "workspace:*",
+        "@napi-rs/cli": "^2.18.4"
     }
 }

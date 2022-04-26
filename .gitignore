@@ -11,13 +11,23 @@ time-travel.*
 
 # Node
 node_modules/
+projects/packages/*/node_modules/
+projects/crates/fractal-napi/node_modules/
+projects/crates/fractal-napi/package-lock.json
 
-# Rust / VMZ / WASM
+# Rust / VMZ
 dist/
 target/
 Cargo.lock
-projects/crates/fractal-wasm/pkg-node/
-projects/crates/fractal-wasm/pkg-web/
+
+# NAPI / leftover platform lib (regenerate with `pnpm build:napi`)
 projects/packages/fractal-*/lib/
+projects/crates/fractal-napi/*.node
+projects/crates/fractal-napi/index.js
+projects/crates/fractal-napi/index.d.ts
+projects/crates/fractal-napi/pkg-node/
+projects/crates/fractal-wasm/pkg-node/
+
+# Browser WASM (regenerate with `pnpm build:wasm`)
+projects/crates/fractal-wasm/pkg-web/
 projects/packages/homepage/public/wasm/
-projects/packages/*/node_modules/
