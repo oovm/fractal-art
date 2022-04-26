@@ -20,8 +20,12 @@
     "scripts": {
         "typecheck": "tsc --noEmit"
     },
-    "dependencies": {
-        "@doki-land/fractal-wasm": "workspace:*"
+    "optionalDependencies": {
+        "@doki-land/fractal-darwin-arm64": "workspace:*",
+        "@doki-land/fractal-darwin-x64": "workspace:*",
+        "@doki-land/fractal-linux-arm64": "workspace:*",
+        "@doki-land/fractal-linux-x64": "workspace:*",
+        "@doki-land/fractal-win32-x64": "workspace:*"
     },
     "engines": {
         "node": ">=18"

@@ -20,6 +20,6 @@
     },
     "devDependencies": {
         "@doki-land/fractal": "workspace:*",
-        "@doki-land/fractal-wasm": "workspace:*"
+        "@doki-land/fractal-win32-x64": "workspace:*"
     }
 }

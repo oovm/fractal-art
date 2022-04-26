@@ -6,7 +6,6 @@ authors = ["Aster <192607617@qq.com>"]
 description = "WASM bindings for @doki-land/fractal"
 repository = "https://github.com/oovm/fractal-art"
 license = "MPL-2.0"
-license-file = "../../../License.md"
 edition = "2021"
 
 [lib]

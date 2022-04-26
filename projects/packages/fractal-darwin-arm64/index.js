@@ -9,12 +9,9 @@ const bindingPath = join(libDir, "fractal_wasm.cjs");
 
 if (!existsSync(bindingPath)) {
     throw new Error(
-        `Missing WASM binding at ${bindingPath}. Run \`pnpm build:wasm\` from the fractal-art workspace root.`,
+        `Missing WASM binding in ${libDir}. Run \`pnpm build:wasm\` from the fractal-art workspace root.`,
     );
 }
 
 const binding = require(bindingPath);
-
-export const rewrite = binding.rewrite;
-export const growPlant = binding.growPlant;
 export default binding;

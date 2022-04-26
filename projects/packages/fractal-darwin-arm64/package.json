@@ -1,0 +1,24 @@
+{
+    "name": "@doki-land/fractal-darwin-arm64",
+    "version": "0.0.0",
+    "description": "Fractal WASM binding for macOS arm64 (Node)",
+    "type": "module",
+    "license": "MPL-2.0",
+    "main": "./index.js",
+    "files": [
+        "index.js",
+        "lib"
+    ],
+    "os": [
+        "darwin"
+    ],
+    "cpu": [
+        "arm64"
+    ],
+    "engines": {
+        "node": ">=18"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

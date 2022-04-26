@@ -4,8 +4,12 @@ npm workspace members and the public demo site live here.
 
 | Path | Role |
 |------|------|
-| `fractal/` | Facade `@doki-land/fractal` (Node API) |
-| `fractal-wasm/` | Platform `@doki-land/fractal-wasm` (`fractal-<platform>`, Node + web WASM) |
+| `fractal/` | Facade `@doki-land/fractal` |
+| `fractal-win32-x64/` | Platform `@doki-land/fractal-win32-x64` |
+| `fractal-linux-x64/` | Platform `@doki-land/fractal-linux-x64` |
+| `fractal-linux-arm64/` | Platform `@doki-land/fractal-linux-arm64` |
+| `fractal-darwin-x64/` | Platform `@doki-land/fractal-darwin-x64` |
+| `fractal-darwin-arm64/` | Platform `@doki-land/fractal-darwin-arm64` |
 | `homepage/` | Demo site host ([VMZ](https://github.com/oovm/vmz-framework) + `@vmz/ui`) |
 
-Heavy fractal work stays in Rust → WASM. Do not put rewrite / turtle compute in pure TypeScript packages.
+Same split as `npm-tools` / Nifty: facade + `@doki-land/*-<platform>`. Heavy fractal work stays in Rust → WASM.

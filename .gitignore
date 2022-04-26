@@ -18,6 +18,6 @@ target/
 Cargo.lock
 projects/crates/fractal-wasm/pkg-node/
 projects/crates/fractal-wasm/pkg-web/
-projects/packages/fractal-wasm/lib/
-projects/packages/fractal-wasm/lib-web/
+projects/packages/fractal-*/lib/
 projects/packages/homepage/public/wasm/
+projects/packages/*/node_modules/

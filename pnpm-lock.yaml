@@ -11,15 +11,11 @@ importers:
       '@doki-land/fractal':
         specifier: workspace:*
         version: link:projects/packages/fractal
-      '@doki-land/fractal-wasm':
+      '@doki-land/fractal-win32-x64':
         specifier: workspace:*
-        version: link:projects/packages/fractal-wasm
+        version: link:projects/packages/fractal-win32-x64
 
   projects/packages/fractal:
-    dependencies:
-      '@doki-land/fractal-wasm':
-        specifier: workspace:*
-        version: link:../fractal-wasm
     devDependencies:
       '@types/node':
         specifier: ^22.13.10
@@ -27,8 +23,32 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.9.3
+    optionalDependencies:
+      '@doki-land/fractal-darwin-arm64':
+        specifier: workspace:*
+        version: link:../fractal-darwin-arm64
+      '@doki-land/fractal-darwin-x64':
+        specifier: workspace:*
+        version: link:../fractal-darwin-x64
+      '@doki-land/fractal-linux-arm64':
+        specifier: workspace:*
+        version: link:../fractal-linux-arm64
+      '@doki-land/fractal-linux-x64':
+        specifier: workspace:*
+        version: link:../fractal-linux-x64
+      '@doki-land/fractal-win32-x64':
+        specifier: workspace:*
+        version: link:../fractal-win32-x64
 
-  projects/packages/fractal-wasm: {}
+  projects/packages/fractal-darwin-arm64: {}
+
+  projects/packages/fractal-darwin-x64: {}
+
+  projects/packages/fractal-linux-arm64: {}
+
+  projects/packages/fractal-linux-x64: {}
+
+  projects/packages/fractal-win32-x64: {}
 
   projects/packages/homepage:
     dependencies:
