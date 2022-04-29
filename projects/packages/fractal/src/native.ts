@@ -28,7 +28,7 @@ const PLATFORM_PACKAGES: Record<string, string> = {
 
 let cached: FractalBinding | undefined;
 
-/** Load the platform WASM binding from `@doki-land/fractal-<platform>`. */
+/** Load the platform Node-API binary from `@doki-land/fractal-<platform>`. */
 export function loadFractalNative(): FractalBinding {
     if (cached) {
         return cached;
@@ -36,14 +36,14 @@ export function loadFractalNative(): FractalBinding {
     const key = `${process.platform}-${process.arch}`;
     const pkg = PLATFORM_PACKAGES[key];
     if (!pkg) {
-        throw new Error(`Unsupported platform for Fractal WASM bindings: ${key}`);
+        throw new Error(`Unsupported platform for Fractal native bindings: ${key}`);
     }
     const require = createRequire(import.meta.url);
     try {
         cached = require(pkg).default as FractalBinding;
     } catch (err) {
         throw new Error(
-            `Failed to load \`${pkg}\`. Run \`pnpm build:wasm\` in the fractal-art workspace, then reinstall.`,
+            `Failed to load \`${pkg}\`. Run \`pnpm build:napi\` in the fractal-art workspace, then reinstall.`,
             { cause: err },
         );
     }

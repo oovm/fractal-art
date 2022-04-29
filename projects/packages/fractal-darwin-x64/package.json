@@ -1,24 +1,12 @@
 {
     "name": "@doki-land/fractal-darwin-x64",
     "version": "0.0.0",
-    "description": "Fractal WASM binding for macOS x64 (Node)",
+    "description": "Fractal Node-API binary for macOS x64",
     "type": "module",
     "license": "MPL-2.0",
     "main": "./index.js",
-    "files": [
-        "index.js",
-        "lib"
-    ],
-    "os": [
-        "darwin"
-    ],
-    "cpu": [
-        "x64"
-    ],
-    "engines": {
-        "node": ">=18"
-    },
-    "publishConfig": {
-        "access": "public"
-    }
+    "files": ["index.js", "lib"],
+    "os": ["darwin"],
+    "cpu": ["x64"],
+    "publishConfig": { "access": "public" }
 }

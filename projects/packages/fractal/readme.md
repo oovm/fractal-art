@@ -1,12 +1,12 @@
-# `@doki-land/fractal`
+# @doki-land/fractal
 
 Node facade for the fractal / L-system engine.
 
-Heavy compute lives in Rust WASM and ships as platform packages
-`@doki-land/fractal-<platform>` (same pattern as `@doki-land/nifty`).
+Heavy compute lives in Rust and ships as `@doki-land/fractal-<platform>`
+Node-API binaries (same layout as `@doki-land/nifty`).
 
 ```bash
-pnpm build:wasm
+pnpm build:napi
 ```
 
 ```js

@@ -1,7 +1,7 @@
 {
     "name": "@doki-land/fractal",
     "version": "0.0.0",
-    "description": "Fractal / L-system engine — Node facade over @doki-land/fractal-<platform> WASM",
+    "description": "Fractal / L-system engine — Node facade over @doki-land/fractal-<platform>",
     "type": "module",
     "license": "MPL-2.0",
     "repository": {
@@ -14,9 +14,7 @@
             "default": "./src/index.ts"
         }
     },
-    "files": [
-        "src"
-    ],
+    "files": ["src"],
     "scripts": {
         "typecheck": "tsc --noEmit"
     },

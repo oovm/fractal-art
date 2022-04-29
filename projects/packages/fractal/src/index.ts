@@ -1,11 +1,11 @@
 /**
  * `@doki-land/fractal` — thin Node facade.
  *
- * Heavy rewrite / turtle work runs in Rust WASM and ships as
- * `@doki-land/fractal-<platform>` (same layout as `@doki-land/nifty`).
+ * Heavy rewrite / turtle work runs in Rust and ships as
+ * `@doki-land/fractal-<platform>` Node-API binaries (same layout as `@doki-land/nifty`).
  * Pure TypeScript is not the compute path.
  *
- * Build the binding first: `pnpm build:wasm`
+ * Build the binding first: `pnpm build:napi`
  */
 
 export type { PlantGrowResult } from "./native.js";

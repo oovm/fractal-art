@@ -1,17 +1,14 @@
 import { createRequire } from "node:module";
-import { existsSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const libDir = join(dirname(fileURLToPath(import.meta.url)), "lib");
-const bindingPath = join(libDir, "fractal_wasm.cjs");
-
-if (!existsSync(bindingPath)) {
-    throw new Error(
-        `Missing WASM binding in ${libDir}. Run \`pnpm build:wasm\` from the fractal-art workspace root.`,
-    );
+const nodeName = readdirSync(libDir).find((name) => name.endsWith(".node"));
+if (!nodeName) {
+    throw new Error(`Missing .node binary in ${libDir}. Run \`pnpm build:napi\` from the repo root.`);
 }
 
-const binding = require(bindingPath);
+const binding = require(join(libDir, nodeName));
 export default binding;

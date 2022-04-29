@@ -1,6 +1,6 @@
 /**
- * Smoke: Node loads `@doki-land/fractal-<platform>` WASM binding.
- * Requires `pnpm build:wasm` first.
+ * Smoke: Node loads `@doki-land/fractal-<platform>` Node-API binding.
+ * Requires `pnpm build:napi` first.
  */
 import { createRequire } from "node:module";
 
