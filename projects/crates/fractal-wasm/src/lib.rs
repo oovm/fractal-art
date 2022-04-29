@@ -1,4 +1,5 @@
-//! WASM export surface for `@doki-land/fractal` (Node + browser).
+//! Browser WASM export surface for the homepage demo.
+//! Node consumers use `fractal-napi` + `@doki-land/fractal-<platform>` instead.
 
 use fractal::{RewriteRule, points_to_polyline, rewrite, turtle_path};
 use serde::Serialize;

@@ -91,7 +91,7 @@ export default class TurtlePanel {
       this.polyline = result.points;
       this.viewBox = result.viewBox;
       this.sourceLength = result.sourceLength;
-      this.status = `Generation ${this.iterations} via @doki-land/fractal (WASM).`;
+      this.status = `Generation ${this.iterations} via fractal WASM (browser).`;
     } catch (err) {
       this.status = `WASM load failed: ${err instanceof Error ? err.message : String(err)}`;
     } finally {
