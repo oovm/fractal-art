@@ -14,6 +14,9 @@ importers:
       '@doki-land/fractal-win32-x64':
         specifier: workspace:*
         version: link:projects/packages/fractal-win32-x64
+      '@doki-land/nifty':
+        specifier: ^0.0.8
+        version: 0.0.8
       '@napi-rs/cli':
         specifier: ^2.18.4
         version: 2.18.4
@@ -74,6 +77,25 @@ importers:
 
 packages:
 
+  '@doki-land/nifty-darwin-arm64@0.0.8':
+    resolution: {integrity: sha512-XlxhqpAptXnwEfXW2sDVyULNUx7mIoYSYseYvfUojsbrIL/1Xt8EJQmjoeG1r7c59NSVUrwvkHl/cijUZHadwQ==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@doki-land/nifty-linux-x64@0.0.8':
+    resolution: {integrity: sha512-DHD3vVnEaIUHgay7uDIavjfbUkS/YjSyM9jBcDYVGzSfFqNiuGqrg2Hrf+lN0vwkbZzKyvdxmvZePPyM133ixQ==}
+    cpu: [x64]
+    os: [linux]
+
+  '@doki-land/nifty-win32-x64@0.0.8':
+    resolution: {integrity: sha512-POlfJ1xHIwe/GjYrwVTUT7QTLZHleWxh0IwZaj3YnBjxiNkq7Do9J2HPi3x120sJD7VZtN+xXloQ8G51uBMNkg==}
+    cpu: [x64]
+    os: [win32]
+
+  '@doki-land/nifty@0.0.8':
+    resolution: {integrity: sha512-KB/8FZMQ7XKdpx6DTETHEMPX9ria+Fx6gI0MKEDOueqm/gthZx6m4WQMOpS6IeXQsuSTMRiyFgFmteu5Z69X2Q==}
+    hasBin: true
+
   '@napi-rs/cli@2.18.4':
     resolution: {integrity: sha512-SgJeA4df9DE2iAEpr3M2H0OKl/yjtg1BnRI5/JyowS71tUWhrfSu2LT0V3vlHET+g1hBVlrO60PmEXwUEKp8Mg==}
     engines: {node: '>= 10'}
@@ -84,6 +106,10 @@ packages:
 
   '@vmz/commander@0.1.32':
     resolution: {integrity: sha512-NJrwXW40y0Iss5+Kw/F9wp0zVsyJhsmkFrPnPlDkXKvAbOV7tF1UDz4hSSsRGC+jumTo4h2rsNPsVgifYn7m6w==}
+    engines: {node: '>=20'}
+
+  '@vmz/commander@0.2.3':
+    resolution: {integrity: sha512-ON4TOearvvJr91ys68nj+9obNiB6MghQrQpqKs5K27BTGarsenYXp8OB89pqNumhNky9rkEo4idyFTPcgBR8gQ==}
     engines: {node: '>=20'}
 
   '@vmz/core@0.1.32':
@@ -261,6 +287,24 @@ packages:
 
 snapshots:
 
+  '@doki-land/nifty-darwin-arm64@0.0.8':
+    optional: true
+
+  '@doki-land/nifty-linux-x64@0.0.8':
+    optional: true
+
+  '@doki-land/nifty-win32-x64@0.0.8':
+    optional: true
+
+  '@doki-land/nifty@0.0.8':
+    dependencies:
+      '@vmz/commander': 0.2.3
+      jiti: 2.7.0
+    optionalDependencies:
+      '@doki-land/nifty-darwin-arm64': 0.0.8
+      '@doki-land/nifty-linux-x64': 0.0.8
+      '@doki-land/nifty-win32-x64': 0.0.8
+
   '@napi-rs/cli@2.18.4': {}
 
   '@types/node@22.20.4':
@@ -268,6 +312,8 @@ snapshots:
       undici-types: 6.21.0
 
   '@vmz/commander@0.1.32': {}
+
+  '@vmz/commander@0.2.3': {}
 
   '@vmz/core@0.1.32':
     dependencies:

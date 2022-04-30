@@ -11,18 +11,22 @@
         "test": "cargo test --release -p fractal",
         "test:rs": "cargo test --release -p fractal",
         "test:napi": "pnpm build:napi && node scripts/smoke-fractal.mjs",
-        "test:wasm": "pnpm build:wasm && node scripts/smoke-fractal.mjs",
         "test:web": "pnpm --filter homepage check",
-        "fmt": "cargo fmt --all",
+        "fmt": "nifty format",
+        "fmt:check": "nifty format --check",
         "fmt:rs": "cargo fmt --all",
         "dev:web": "pnpm --filter homepage dev",
-        "push": "cargo test --release -p fractal && git push",
+        "p": "git push && git push --tags --prune",
         "reset": "git reset Head~ --soft",
-        "u": "cargo upgrade --offline --incompatible"
+        "u": "nifty update",
+        "bump": "nifty bump",
+        "publish": "nifty publish",
+        "trust": "nifty trust"
     },
     "devDependencies": {
         "@doki-land/fractal": "workspace:*",
         "@doki-land/fractal-win32-x64": "workspace:*",
+        "@doki-land/nifty": "^0.0.8",
         "@napi-rs/cli": "^2.18.4"
     }
 }
