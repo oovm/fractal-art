@@ -61,13 +61,13 @@ importers:
       '@doki-land/fractal':
         specifier: workspace:*
         version: link:../fractal
-    devDependencies:
       '@vmz/core':
         specifier: 0.1.32
         version: 0.1.32
       '@vmz/ui':
         specifier: 0.1.32
         version: 0.1.32
+    devDependencies:
       '@vmz/vmz':
         specifier: 0.1.32
         version: 0.1.32(typescript@5.9.3)

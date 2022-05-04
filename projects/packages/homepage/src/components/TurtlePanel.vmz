@@ -1,47 +1,58 @@
 <template>
-  <section class="turtle">
-    <div class="toolbar">
-      <label>
-        Iterations
-        <input type="number" min="1" max="5" :value="iterations" @input="onIterInput" />
-      </label>
-      <Button type="button" @click="grow">Grow</Button>
-      <Button type="button" variant="ghost" @click="reset">Reset</Button>
-    </div>
-    <p class="status">{{ status }}</p>
-    <svg class="canvas" :viewBox="viewBox" role="img" aria-label="L-system turtle path">
+  <Space direction="vertical" size="large" class="turtle">
+    <Space wrap size="middle" class="toolbar">
+      <Field
+        label="Iterations"
+        type="number"
+        min="1"
+        max="5"
+        :value="iterationsText"
+        description="1–5 generations of the classic plant production."
+        @input="onIterInput"
+      />
+      <Space wrap size="small" class="actions">
+        <Button type="button" @click="grow">Grow</Button>
+        <Button type="button" variant="ghost" @click="reset">Reset</Button>
+      </Space>
+    </Space>
+
+    <Callout :tone="calloutTone" :title="calloutTitle" :description="status" />
+
+    <svg
+      class="canvas"
+      :viewBox="viewBox"
+      role="img"
+      aria-label="L-system turtle path"
+    >
       <polyline class="stroke" fill="none" :points="polyline" />
     </svg>
-    <p class="meta">String length: {{ sourceLength }}</p>
-  </section>
+
+    <Typography variant="secondary">String length: {{ sourceLength }}</Typography>
+  </Space>
 </template>
 
 <style>
 .toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  align-items: end;
-  margin-bottom: 1rem;
+  align-items: flex-end;
+  width: 100%;
+}
+.actions {
+  align-items: center;
+  padding-bottom: 0.15rem;
 }
 .canvas {
   display: block;
-  width: min(100%, 28rem);
-  height: 18rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  background: #f9fafb;
+  width: min(100%, 36rem);
+  height: 22rem;
+  border: 1px solid var(--vmz-line-default);
+  border-radius: var(--vmz-radius-lg, 8px);
+  background: var(--vmz-surface-mist, #f5f5f5);
 }
 .stroke {
-  stroke: #166534;
-  stroke-width: 1.2;
+  stroke: var(--vmz-status-success-accent, #52c41a);
+  stroke-width: 2.4;
   stroke-linejoin: round;
   stroke-linecap: round;
-}
-.status,
-.meta {
-  font-size: 0.875rem;
-  color: #4b5563;
 }
 </style>
 
@@ -72,11 +83,14 @@ function loadWasm(): Promise<WasmModule> {
 
 export default class TurtlePanel {
   iterations = 3;
+  iterationsText = "3";
   polyline = "";
   viewBox = "0 0 100 100";
   status = "Loading WASM plant engine…";
   sourceLength = 0;
   busy = false;
+  calloutTone = "info";
+  calloutTitle = "Status";
 
   constructor() {
     void this.draw();
@@ -85,15 +99,23 @@ export default class TurtlePanel {
   async draw() {
     if (this.busy) return;
     this.busy = true;
+    this.calloutTone = "info";
+    this.calloutTitle = "Growing";
+    this.status = "Running plant rewrite in Rust WASM…";
     try {
       const wasm = await loadWasm();
       const result = wasm.growPlant(this.iterations, 8, 25, 16);
       this.polyline = result.points;
       this.viewBox = result.viewBox;
       this.sourceLength = result.sourceLength;
-      this.status = `Generation ${this.iterations} via fractal WASM (browser).`;
+      this.iterationsText = String(this.iterations);
+      this.calloutTone = "success";
+      this.calloutTitle = `Generation ${this.iterations}`;
+      this.status = "Plant path rendered from `@doki-land/fractal` WASM (browser).";
     } catch (err) {
-      this.status = `WASM load failed: ${err instanceof Error ? err.message : String(err)}`;
+      this.calloutTone = "danger";
+      this.calloutTitle = "WASM failed";
+      this.status = err instanceof Error ? err.message : String(err);
     } finally {
       this.busy = false;
     }
@@ -105,18 +127,21 @@ export default class TurtlePanel {
     const next = Number.parseInt(target.value, 10);
     if (!Number.isFinite(next) || next < 1 || next > 5) return;
     this.iterations = next;
+    this.iterationsText = String(next);
     void this.draw();
   }
 
   grow() {
     if (this.iterations < 5) {
       this.iterations += 1;
+      this.iterationsText = String(this.iterations);
     }
     void this.draw();
   }
 
   reset() {
     this.iterations = 1;
+    this.iterationsText = "1";
     void this.draw();
   }
 }

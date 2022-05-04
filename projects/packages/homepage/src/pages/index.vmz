@@ -1,6 +1,9 @@
 <template>
-  <AppShell brand="Fractal" home-href="/" nav-label="Turtle">
-    <Card title="Lindenmayer turtle" description="Browser demo uses WASM. Node packages load `@doki-land/fractal-<platform>` Node-API binaries.">
+  <AppShell brand="Fractal" home-href="/" nav-label="Demo">
+    <Card
+      title="Lindenmayer turtle"
+      description="Browser demo grows the plant L-system in Rust WASM. Node packages ship `@doki-land/fractal-<platform>` Node-API binaries."
+    >
       <TurtlePanel />
     </Card>
   </AppShell>
