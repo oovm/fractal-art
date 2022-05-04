@@ -1,0 +1,37 @@
+/* Fractal homepage — Style Theme global surface. Tokens from designs/tokens/*.json */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light dark;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: var(--vmz-font-sans);
+  font-size: 14px;
+  line-height: 1.5715;
+  color: var(--vmz-text-ink);
+  background: var(--vmz-surface-page, var(--vmz-surface-mist, #f5f5f5));
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+::selection {
+  background: var(--vmz-scale-200);
+  color: var(--vmz-surface-ink);
+}
+
+a {
+  color: var(--vmz-action-primary-background);
+}
