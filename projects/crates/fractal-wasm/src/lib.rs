@@ -1,15 +1,20 @@
 //! Browser WASM export surface for the homepage demo.
-//! Node consumers use `fractal-napi` + `@doki-land/fractal-<platform>` instead.
+//! Compute only: rewrite + turtle points. SVG/Canvas rendering stays in TypeScript.
 
-use fractal::{RewriteRule, points_to_polyline, rewrite, turtle_path};
+use fractal::{RewriteRule, rewrite, turtle_path};
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
 
 #[derive(Serialize)]
+struct PointJs {
+    x: f64,
+    y: f64,
+}
+
+#[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-struct PolylinePayload {
-    points: String,
-    view_box: String,
+struct PlantPath {
+    points: Vec<PointJs>,
     source: String,
     source_length: usize,
 }
@@ -37,16 +42,14 @@ pub fn js_rewrite(axiom: &str, rules: JsValue, iterations: u32) -> Result<String
     Ok(rewrite(axiom, &rules, iterations as usize))
 }
 
-/// Grow the classic plant L-system and return SVG polyline fields.
+/// Grow the classic plant L-system and return turtle points (no SVG bake-in).
 #[wasm_bindgen(js_name = growPlant)]
-pub fn grow_plant(iterations: u32, step: f64, turn_degrees: f64, padding: f64) -> Result<JsValue, JsValue> {
+pub fn grow_plant(iterations: u32, step: f64, turn_degrees: f64) -> Result<JsValue, JsValue> {
     let plant = RewriteRule { from: 'F', to: PLANT_TO };
     let source = rewrite("F", &[plant], iterations as usize);
     let path = turtle_path(&source, step, turn_degrees);
-    let view = points_to_polyline(&path, padding);
-    let payload = PolylinePayload {
-        points: view.points,
-        view_box: view.view_box,
+    let payload = PlantPath {
+        points: path.iter().map(|p| PointJs { x: p.x, y: p.y }).collect(),
         source_length: source.len(),
         source,
     };

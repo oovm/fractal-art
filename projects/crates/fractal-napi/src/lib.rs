@@ -1,17 +1,21 @@
 //! Node-API export surface for `@doki-land/fractal`.
+//! Compute only: rewrite + turtle points. SVG/Canvas rendering stays in TypeScript.
 
-use fractal::{
-    RewriteRule, points_to_polyline, rewrite as rewrite_core, turtle_path,
-};
+use fractal::{RewriteRule, rewrite as rewrite_core, turtle_path};
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
 
 const PLANT_TO: &str = "FF+[+F-F-F]-[-F+F+F]";
 
 #[napi(object)]
-pub struct PlantGrowResult {
-    pub points: String,
-    pub view_box: String,
+pub struct Point2 {
+    pub x: f64,
+    pub y: f64,
+}
+
+#[napi(object)]
+pub struct PlantPath {
+    pub points: Vec<Point2>,
     pub source: String,
     pub source_length: u32,
 }
@@ -36,16 +40,14 @@ pub fn rewrite(axiom: String, rules: Vec<String>, iterations: u32) -> Result<Str
     Ok(rewrite_core(&axiom, &mapped, iterations as usize))
 }
 
-/// Grow the classic plant L-system and return SVG polyline fields.
+/// Grow the classic plant L-system and return turtle points (no SVG bake-in).
 #[napi]
-pub fn grow_plant(iterations: u32, step: f64, turn_degrees: f64, padding: f64) -> PlantGrowResult {
+pub fn grow_plant(iterations: u32, step: f64, turn_degrees: f64) -> PlantPath {
     let plant = RewriteRule { from: 'F', to: PLANT_TO };
     let source = rewrite_core("F", &[plant], iterations as usize);
     let path = turtle_path(&source, step, turn_degrees);
-    let view = points_to_polyline(&path, padding);
-    PlantGrowResult {
-        points: view.points,
-        view_box: view.view_box,
+    PlantPath {
+        points: path.iter().map(|p| Point2 { x: p.x, y: p.y }).collect(),
         source_length: source.len() as u32,
         source,
     }
