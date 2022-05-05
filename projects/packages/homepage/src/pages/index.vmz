@@ -2,7 +2,7 @@
   <AppShell brand="Fractal" home-href="/" nav-label="Demo">
     <Card
       title="Lindenmayer turtle"
-      description="Browser demo grows the plant L-system in Rust WASM. Node packages ship `@doki-land/fractal-<platform>` Node-API binaries."
+      description="Browser demo: Rust WASM computes turtle points; TypeScript paints the canvas. Node packages ship `@doki-land/fractal-<platform>` Node-API binaries."
     >
       <TurtlePanel />
     </Card>
