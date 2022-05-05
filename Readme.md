@@ -40,10 +40,11 @@ pnpm test:napi
 ## Node
 
 ```js
-import { growPlant, rewrite } from "@doki-land/fractal";
+import { growPlant, rewrite, toSvgPolyline } from "@doki-land/fractal";
 
 const plant = growPlant(4);
-console.log(plant.sourceLength, plant.viewBox);
+const svg = toSvgPolyline(plant.points);
+console.log(plant.points.length, svg.viewBox);
 ```
 
 ## Web (homepage)

@@ -1,29 +1,31 @@
 /**
  * `@doki-land/fractal` — thin Node facade.
  *
- * Heavy rewrite / turtle work runs in Rust and ships as
- * `@doki-land/fractal-<platform>` Node-API binaries (same layout as `@doki-land/nifty`).
- * Pure TypeScript is not the compute path.
+ * Rust (NAPI) owns rewrite / turtle geometry.
+ * TypeScript owns SVG / Canvas rendering (`./render.js`).
  *
  * Build the binding first: `pnpm build:napi`
  */
 
-export type { PlantGrowResult } from "./native.js";
+export type { PlantPath, Point2 } from "./native.js";
 export { loadFractalNative } from "./native.js";
+export {
+    fitBounds,
+    strokeCanvas,
+    toSvgPolyline,
+    type CanvasStrokeOptions,
+    type FitBounds,
+    type SvgPolyline,
+} from "./render.js";
 
-import { loadFractalNative, type PlantGrowResult } from "./native.js";
+import { loadFractalNative, type PlantPath } from "./native.js";
 
 /** Parallel L-system rewrite. `rules` is a flat `[from, to, from, to, …]` list. */
 export function rewrite(axiom: string, rules: string[], iterations: number): string {
     return loadFractalNative().rewrite(axiom, rules, iterations);
 }
 
-/** Grow the classic plant L-system and return SVG polyline fields. */
-export function growPlant(
-    iterations: number,
-    step = 8,
-    turnDegrees = 25,
-    padding = 16,
-): PlantGrowResult {
-    return loadFractalNative().growPlant(iterations, step, turnDegrees, padding);
+/** Grow the classic plant L-system and return turtle points (render separately). */
+export function growPlant(iterations: number, step = 8, turnDegrees = 25): PlantPath {
+    return loadFractalNative().growPlant(iterations, step, turnDegrees);
 }

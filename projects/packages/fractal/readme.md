@@ -1,19 +1,17 @@
-# @doki-land/fractal
-
-Node facade for the fractal / L-system engine.
-
-Heavy compute lives in Rust and ships as `@doki-land/fractal-<platform>`
-Node-API binaries (same layout as `@doki-land/nifty`).
-
-```bash
-pnpm build:napi
-```
-
-```js
-import { growPlant, rewrite } from "@doki-land/fractal";
-
-const plant = growPlant(4);
-console.log(plant.sourceLength, plant.viewBox);
-
-const next = rewrite("A", ["A", "AB", "B", "A"], 3);
-```
+/**
+ * `@doki-land/fractal` — thin Node facade.
+ *
+ * Heavy rewrite / turtle geometry runs in Rust (`@doki-land/fractal-<platform>`).
+ * SVG / Canvas painting is TypeScript — see `src/render.ts`.
+ *
+ * ```bash
+ * pnpm build:napi
+ * ```
+ *
+ * ```js
+ * import { growPlant, strokeCanvas, toSvgPolyline } from "@doki-land/fractal";
+ *
+ * const plant = growPlant(4);
+ * const svg = toSvgPolyline(plant.points);
+ * ```
+ */

@@ -1,20 +1,20 @@
 import { createRequire } from "node:module";
 
-export type PlantGrowResult = {
-    points: string;
-    viewBox: string;
+export type Point2 = { x: number; y: number };
+
+export type PlantPath = {
+    points: Point2[];
     source: string;
     sourceLength: number;
 };
 
 type FractalBinding = {
     rewrite: (axiom: string, rules: string[], iterations: number) => string;
-    growPlant: (
-        iterations: number,
-        step: number,
-        turnDegrees: number,
-        padding: number,
-    ) => PlantGrowResult;
+    growPlant: (iterations: number, step: number, turnDegrees: number) => {
+        points: Point2[];
+        source: string;
+        sourceLength: number;
+    };
 };
 
 /** Platform package map — same shape as `@doki-land/nifty-<platform>`. */
