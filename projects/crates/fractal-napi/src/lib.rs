@@ -1,7 +1,7 @@
 //! Node-API export surface for `@doki-land/fractal`.
-//! Compute only: rewrite + turtle points. SVG/Canvas rendering stays in TypeScript.
+//! Compute only: rewrite + turtle / IFS points. SVG/Canvas rendering stays in TypeScript.
 
-use fractal::{RewriteRule, rewrite as rewrite_core, turtle_path};
+use fractal::{RewriteRule, grow_fern as grow_fern_core, rewrite as rewrite_core, turtle_path};
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
 
@@ -18,6 +18,12 @@ pub struct PlantPath {
     pub points: Vec<Point2>,
     pub source: String,
     pub source_length: u32,
+}
+
+#[napi(object)]
+pub struct PointCloud {
+    pub points: Vec<Point2>,
+    pub count: u32,
 }
 
 /// Parallel L-system rewrite. `rules` is a flat `[from, to, from, to, …]` list.
@@ -50,5 +56,15 @@ pub fn grow_plant(iterations: u32, step: f64, turn_degrees: f64) -> PlantPath {
         points: path.iter().map(|p| Point2 { x: p.x, y: p.y }).collect(),
         source_length: source.len() as u32,
         source,
+    }
+}
+
+/// Sample the classic Barnsley fern IFS (geometry only, deterministic for a given seed).
+#[napi]
+pub fn grow_fern(iterations: u32, seed: u32) -> PointCloud {
+    let path = grow_fern_core(iterations as usize, seed as u64);
+    PointCloud {
+        count: path.len() as u32,
+        points: path.iter().map(|p| Point2 { x: p.x, y: p.y }).collect(),
     }
 }

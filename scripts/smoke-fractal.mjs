@@ -29,6 +29,15 @@ if (!Array.isArray(plant.points) || plant.points.length < 2 || !(plant.sourceLen
     throw new Error(`growPlant smoke failed: ${JSON.stringify({ len: plant.points?.length, sourceLength: plant.sourceLength })}`);
 }
 
+const fern = binding.growFern(5_000, 42);
+if (!Array.isArray(fern.points) || fern.points.length !== 5_000 || fern.count !== 5_000) {
+    throw new Error(`growFern smoke failed: ${JSON.stringify({ len: fern.points?.length, count: fern.count })}`);
+}
+const fernAgain = binding.growFern(5_000, 42);
+if (fern.points[0].x !== fernAgain.points[0].x || fern.points[0].y !== fernAgain.points[0].y) {
+    throw new Error("growFern seed is not deterministic");
+}
+
 /** Mirrors `@doki-land/fractal` `toSvgPolyline` (compute ≠ paint). */
 function toSvgPolyline(points, padding = 16) {
     if (points.length === 0) return { points: "", viewBox: "0 0 100 100" };
@@ -60,5 +69,6 @@ console.log("smoke ok", {
     algae,
     sourceLength: plant.sourceLength,
     pointCount: plant.points.length,
+    fernCount: fern.count,
     viewBox: svg.viewBox,
 });

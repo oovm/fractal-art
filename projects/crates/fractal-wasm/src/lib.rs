@@ -1,7 +1,7 @@
 //! Browser WASM export surface for the homepage demo.
-//! Compute only: rewrite + turtle points. SVG/Canvas rendering stays in TypeScript.
+//! Compute only: rewrite + turtle / IFS points. SVG/Canvas rendering stays in TypeScript.
 
-use fractal::{RewriteRule, rewrite, turtle_path};
+use fractal::{RewriteRule, grow_fern as grow_fern_core, rewrite, turtle_path};
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
 
@@ -17,6 +17,13 @@ struct PlantPath {
     points: Vec<PointJs>,
     source: String,
     source_length: usize,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct PointCloud {
+    points: Vec<PointJs>,
+    count: usize,
 }
 
 const PLANT_TO: &str = "FF+[+F-F-F]-[-F+F+F]";
@@ -52,6 +59,17 @@ pub fn grow_plant(iterations: u32, step: f64, turn_degrees: f64) -> Result<JsVal
         points: path.iter().map(|p| PointJs { x: p.x, y: p.y }).collect(),
         source_length: source.len(),
         source,
+    };
+    serde_wasm_bindgen::to_value(&payload).map_err(js_err)
+}
+
+/// Sample the classic Barnsley fern IFS (geometry only, deterministic for a given seed).
+#[wasm_bindgen(js_name = growFern)]
+pub fn grow_fern(iterations: u32, seed: u32) -> Result<JsValue, JsValue> {
+    let path = grow_fern_core(iterations as usize, seed as u64);
+    let payload = PointCloud {
+        count: path.len(),
+        points: path.iter().map(|p| PointJs { x: p.x, y: p.y }).collect(),
     };
     serde_wasm_bindgen::to_value(&payload).map_err(js_err)
 }
