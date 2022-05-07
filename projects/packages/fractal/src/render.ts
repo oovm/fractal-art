@@ -27,6 +27,13 @@ export type CanvasStrokeOptions = {
     background?: string;
 };
 
+export type CanvasPlotOptions = {
+    padding?: number;
+    fillStyle?: string;
+    pointSize?: number;
+    background?: string;
+};
+
 /** Axis-aligned bounds of a turtle path. */
 export function fitBounds(points: Point2[], padding = 16): FitBounds {
     if (points.length === 0) {
@@ -102,4 +109,39 @@ export function strokeCanvas(
         else ctx.lineTo(x, y);
     }
     ctx.stroke();
+}
+
+/** Plot an IFS / chaos-game point cloud onto a 2D canvas. */
+export function plotCanvas(
+    canvas: HTMLCanvasElement | OffscreenCanvas,
+    points: Point2[],
+    options: CanvasPlotOptions = {},
+): void {
+    const padding = options.padding ?? 16;
+    const pointSize = options.pointSize ?? 1;
+    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null;
+    if (!ctx) {
+        throw new Error("2D canvas context unavailable");
+    }
+    const width = "width" in canvas ? Number(canvas.width) : 0;
+    const height = "height" in canvas ? Number(canvas.height) : 0;
+    ctx.clearRect(0, 0, width, height);
+    if (options.background) {
+        ctx.fillStyle = options.background;
+        ctx.fillRect(0, 0, width, height);
+    }
+    if (points.length === 0) {
+        return;
+    }
+    const box = fitBounds(points, padding);
+    const scale = Math.min(width / box.width, height / box.height);
+    const ox = (width - box.width * scale) / 2;
+    const oy = (height - box.height * scale) / 2;
+
+    ctx.fillStyle = options.fillStyle ?? "#389e0d";
+    for (const p of points) {
+        const x = ox + (p.x - box.minX) * scale;
+        const y = oy + (p.y - box.minY) * scale;
+        ctx.fillRect(x, y, pointSize, pointSize);
+    }
 }

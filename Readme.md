@@ -47,6 +47,14 @@ const svg = toSvgPolyline(plant.points);
 console.log(plant.points.length, svg.viewBox);
 ```
 
+```js
+import { growFern, plotCanvas } from "@doki-land/fractal";
+
+const fern = growFern(50_000, 42);
+// plotCanvas(canvasEl, fern.points) in a browser / canvas host
+console.log(fern.count);
+```
+
 ## Web (homepage)
 
 ```bash

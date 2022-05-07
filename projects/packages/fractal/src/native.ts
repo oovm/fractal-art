@@ -8,12 +8,21 @@ export type PlantPath = {
     sourceLength: number;
 };
 
+export type PointCloud = {
+    points: Point2[];
+    count: number;
+};
+
 type FractalBinding = {
     rewrite: (axiom: string, rules: string[], iterations: number) => string;
     growPlant: (iterations: number, step: number, turnDegrees: number) => {
         points: Point2[];
         source: string;
         sourceLength: number;
+    };
+    growFern: (iterations: number, seed: number) => {
+        points: Point2[];
+        count: number;
     };
 };
 
