@@ -1,11 +1,19 @@
 <template>
   <AppShell brand="Fractal" home-href="/" nav-label="Demo">
-    <Card
-      title="Lindenmayer turtle"
-      description="Browser demo: Rust WASM computes turtle points; TypeScript paints the canvas. Node packages ship `@doki-land/fractal-<platform>` Node-API binaries."
-    >
-      <TurtlePanel />
-    </Card>
+    <Space direction="vertical" size="large">
+      <Card
+        title="Lindenmayer turtle"
+        description="Browser demo: Rust WASM computes turtle points; TypeScript paints the canvas. Node packages ship `@doki-land/fractal-<platform>` Node-API binaries."
+      >
+        <TurtlePanel />
+      </Card>
+      <Card
+        title="Barnsley fern (IFS)"
+        description="Second generator family: chaos-game IFS in Rust WASM, point-cloud plot in TypeScript."
+      >
+        <FernPanel />
+      </Card>
+    </Space>
   </AppShell>
 </template>
 
