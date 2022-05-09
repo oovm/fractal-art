@@ -1,4 +1,4 @@
-use fractal::{Point, RewriteRule, grow_fern, points_to_polyline, rewrite, turtle_path};
+use fractal::{Point, RewriteRule, grow_fern, mandelbrot, points_to_polyline, rewrite, turtle_path};
 
 #[test]
 fn ready() {
@@ -39,4 +39,18 @@ fn barnsley_fern_is_deterministic_and_bounded() {
     assert!(min_y > -1.0 && max_y < 11.0, "y in [{min_y}, {max_y}]");
     let other = grow_fern(2_000, 99);
     assert_ne!(a, other);
+}
+
+#[test]
+fn mandelbrot_marks_cardioid_interior() {
+    let field = mandelbrot(64, 48, -0.5, 0.0, 3.0, 80);
+    assert_eq!(field.width, 64);
+    assert_eq!(field.height, 48);
+    assert_eq!(field.values.len(), 64 * 48);
+    // Near c = 0 the orbit stays bounded → hits max_iter.
+    let cx = 32_usize;
+    let cy = 24_usize;
+    assert_eq!(field.values[cy * 64 + cx], 80);
+    // Far left of the set escapes quickly.
+    assert!(field.values[cy * 64 + 0] < 10);
 }
