@@ -13,6 +13,12 @@
       >
         <FernPanel />
       </Card>
+      <Card
+        title="Escape time (Mandelbrot / Julia)"
+        description="Iteration fields from Rust WASM; TypeScript maps values to ImageData. Type `mandelbrot` or `julia` in Family."
+      >
+        <EscapePanel />
+      </Card>
     </Space>
   </AppShell>
 </template>
