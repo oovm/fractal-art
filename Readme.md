@@ -55,6 +55,14 @@ const fern = growFern(50_000, 42);
 console.log(fern.count);
 ```
 
+```js
+import { mandelbrot, paintEscapeField } from "@doki-land/fractal";
+
+const field = mandelbrot(640, 400, -0.5, 0, 3, 120);
+// paintEscapeField(canvasEl, field) in a browser / canvas host
+console.log(field.width, field.height, field.values.length);
+```
+
 ## Web (homepage)
 
 ```bash

@@ -34,6 +34,20 @@ export type CanvasPlotOptions = {
     background?: string;
 };
 
+export type EscapeFieldLike = {
+    width: number;
+    height: number;
+    maxIter: number;
+    values: ArrayLike<number>;
+};
+
+export type EscapePaintOptions = {
+    /** Interior (max-iter) fill RGB. Default near-black. */
+    interiorRgb?: [number, number, number];
+    /** Hue degrees for escaped pixels (HSL). Default 210. */
+    hue?: number;
+};
+
 /** Axis-aligned bounds of a turtle path. */
 export function fitBounds(points: Point2[], padding = 16): FitBounds {
     if (points.length === 0) {
@@ -144,4 +158,83 @@ export function plotCanvas(
         const y = oy + (p.y - box.minY) * scale;
         ctx.fillRect(x, y, pointSize, pointSize);
     }
+}
+
+/** Paint an escape-time field onto a 2D canvas (ImageData; color mapping only). */
+export function paintEscapeField(
+    canvas: HTMLCanvasElement | OffscreenCanvas,
+    field: EscapeFieldLike,
+    options: EscapePaintOptions = {},
+): void {
+    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null;
+    if (!ctx) {
+        throw new Error("2D canvas context unavailable");
+    }
+    const width = field.width | 0;
+    const height = field.height | 0;
+    if (width < 1 || height < 1 || field.values.length < width * height) {
+        throw new Error("escape field dimensions do not match values");
+    }
+    if ("width" in canvas) {
+        canvas.width = width;
+        canvas.height = height;
+    }
+    const image = ctx.createImageData(width, height);
+    const data = image.data;
+    const maxIter = Math.max(field.maxIter, 1);
+    const hue = options.hue ?? 210;
+    const [ir, ig, ib] = options.interiorRgb ?? [8, 8, 16];
+
+    for (let i = 0; i < width * height; i++) {
+        const iter = field.values[i] ?? 0;
+        const o = i * 4;
+        if (iter >= maxIter) {
+            data[o] = ir;
+            data[o + 1] = ig;
+            data[o + 2] = ib;
+            data[o + 3] = 255;
+            continue;
+        }
+        const t = iter / maxIter;
+        const { r, g, b } = hslToRgb(hue, 0.72, 0.12 + t * 0.62);
+        data[o] = r;
+        data[o + 1] = g;
+        data[o + 2] = b;
+        data[o + 3] = 255;
+    }
+    ctx.putImageData(image, 0, 0);
+}
+
+function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
+    const hue = ((h % 360) + 360) % 360;
+    const c = (1 - Math.abs(2 * l - 1)) * s;
+    const x = c * (1 - Math.abs(((hue / 60) % 2) - 1));
+    const m = l - c / 2;
+    let rp = 0;
+    let gp = 0;
+    let bp = 0;
+    if (hue < 60) {
+        rp = c;
+        gp = x;
+    } else if (hue < 120) {
+        rp = x;
+        gp = c;
+    } else if (hue < 180) {
+        gp = c;
+        bp = x;
+    } else if (hue < 240) {
+        gp = x;
+        bp = c;
+    } else if (hue < 300) {
+        rp = x;
+        bp = c;
+    } else {
+        rp = c;
+        bp = x;
+    }
+    return {
+        r: Math.round((rp + m) * 255),
+        g: Math.round((gp + m) * 255),
+        b: Math.round((bp + m) * 255),
+    };
 }

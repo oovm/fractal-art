@@ -13,6 +13,13 @@ export type PointCloud = {
     count: number;
 };
 
+export type EscapeField = {
+    width: number;
+    height: number;
+    maxIter: number;
+    values: number[] | Uint16Array;
+};
+
 type FractalBinding = {
     rewrite: (axiom: string, rules: string[], iterations: number) => string;
     growPlant: (iterations: number, step: number, turnDegrees: number) => {
@@ -23,6 +30,34 @@ type FractalBinding = {
     growFern: (iterations: number, seed: number) => {
         points: Point2[];
         count: number;
+    };
+    mandelbrot: (
+        width: number,
+        height: number,
+        centerX: number,
+        centerY: number,
+        scale: number,
+        maxIter: number,
+    ) => {
+        width: number;
+        height: number;
+        maxIter: number;
+        values: number[] | Uint16Array;
+    };
+    julia: (
+        width: number,
+        height: number,
+        centerX: number,
+        centerY: number,
+        scale: number,
+        cx: number,
+        cy: number,
+        maxIter: number,
+    ) => {
+        width: number;
+        height: number;
+        maxIter: number;
+        values: number[] | Uint16Array;
     };
 };
 
