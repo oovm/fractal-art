@@ -1,9 +1,15 @@
 //! Browser WASM export surface for the homepage demo.
-//! Compute only: rewrite + turtle / IFS points. SVG/Canvas rendering stays in TypeScript.
+//! Compute only: rewrite + turtle / IFS / escape fields. SVG/Canvas rendering stays in TypeScript.
 
-use fractal::{RewriteRule, grow_fern as grow_fern_core, rewrite, turtle_path};
+use fractal::{
+    RewriteRule, grow_fern as grow_fern_core, julia as julia_core, mandelbrot as mandelbrot_core,
+    rewrite, turtle_path,
+};
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
+
+const PLANT_TO: &str = "FF+[+F-F-F]-[-F+F+F]";
+const MAX_FIELD_SIDE: u32 = 1024;
 
 #[derive(Serialize)]
 struct PointJs {
@@ -26,7 +32,18 @@ struct PointCloud {
     count: usize,
 }
 
-const PLANT_TO: &str = "FF+[+F-F-F]-[-F+F+F]";
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct EscapeField {
+    width: u32,
+    height: u32,
+    max_iter: u32,
+    values: Vec<u16>,
+}
+
+fn clamp_side(side: u32) -> u32 {
+    side.clamp(1, MAX_FIELD_SIDE)
+}
 
 /// Parallel L-system rewrite. `rules` is a flat `[from, to, from, to, …]` list.
 #[wasm_bindgen(js_name = rewrite)]
@@ -70,6 +87,64 @@ pub fn grow_fern(iterations: u32, seed: u32) -> Result<JsValue, JsValue> {
     let payload = PointCloud {
         count: path.len(),
         points: path.iter().map(|p| PointJs { x: p.x, y: p.y }).collect(),
+    };
+    serde_wasm_bindgen::to_value(&payload).map_err(js_err)
+}
+
+/// Sample a Mandelbrot escape-time field (row-major `values`, no color bake-in).
+#[wasm_bindgen(js_name = mandelbrot)]
+pub fn mandelbrot(
+    width: u32,
+    height: u32,
+    center_x: f64,
+    center_y: f64,
+    scale: f64,
+    max_iter: u32,
+) -> Result<JsValue, JsValue> {
+    let field = mandelbrot_core(
+        clamp_side(width),
+        clamp_side(height),
+        center_x,
+        center_y,
+        scale,
+        max_iter.max(1),
+    );
+    let payload = EscapeField {
+        width: field.width,
+        height: field.height,
+        max_iter: field.max_iter,
+        values: field.values,
+    };
+    serde_wasm_bindgen::to_value(&payload).map_err(js_err)
+}
+
+/// Sample a Julia escape-time field for fixed `c = (cx, cy)`.
+#[wasm_bindgen(js_name = julia)]
+pub fn julia(
+    width: u32,
+    height: u32,
+    center_x: f64,
+    center_y: f64,
+    scale: f64,
+    cx: f64,
+    cy: f64,
+    max_iter: u32,
+) -> Result<JsValue, JsValue> {
+    let field = julia_core(
+        clamp_side(width),
+        clamp_side(height),
+        center_x,
+        center_y,
+        scale,
+        cx,
+        cy,
+        max_iter.max(1),
+    );
+    let payload = EscapeField {
+        width: field.width,
+        height: field.height,
+        max_iter: field.max_iter,
+        values: field.values,
     };
     serde_wasm_bindgen::to_value(&payload).map_err(js_err)
 }

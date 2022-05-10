@@ -1,11 +1,15 @@
 //! Node-API export surface for `@doki-land/fractal`.
-//! Compute only: rewrite + turtle / IFS points. SVG/Canvas rendering stays in TypeScript.
+//! Compute only: rewrite + turtle / IFS / escape fields. SVG/Canvas rendering stays in TypeScript.
 
-use fractal::{RewriteRule, grow_fern as grow_fern_core, rewrite as rewrite_core, turtle_path};
+use fractal::{
+    RewriteRule, grow_fern as grow_fern_core, julia as julia_core, mandelbrot as mandelbrot_core,
+    rewrite as rewrite_core, turtle_path,
+};
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
 
 const PLANT_TO: &str = "FF+[+F-F-F]-[-F+F+F]";
+const MAX_FIELD_SIDE: u32 = 2048;
 
 #[napi(object)]
 pub struct Point2 {
@@ -24,6 +28,18 @@ pub struct PlantPath {
 pub struct PointCloud {
     pub points: Vec<Point2>,
     pub count: u32,
+}
+
+#[napi(object)]
+pub struct EscapeField {
+    pub width: u32,
+    pub height: u32,
+    pub max_iter: u32,
+    pub values: Vec<u16>,
+}
+
+fn clamp_side(side: u32) -> u32 {
+    side.clamp(1, MAX_FIELD_SIDE)
 }
 
 /// Parallel L-system rewrite. `rules` is a flat `[from, to, from, to, …]` list.
@@ -66,5 +82,61 @@ pub fn grow_fern(iterations: u32, seed: u32) -> PointCloud {
     PointCloud {
         count: path.len() as u32,
         points: path.iter().map(|p| Point2 { x: p.x, y: p.y }).collect(),
+    }
+}
+
+/// Sample a Mandelbrot escape-time field (row-major `values`, no color bake-in).
+#[napi]
+pub fn mandelbrot(
+    width: u32,
+    height: u32,
+    center_x: f64,
+    center_y: f64,
+    scale: f64,
+    max_iter: u32,
+) -> EscapeField {
+    let field = mandelbrot_core(
+        clamp_side(width),
+        clamp_side(height),
+        center_x,
+        center_y,
+        scale,
+        max_iter.max(1),
+    );
+    EscapeField {
+        width: field.width,
+        height: field.height,
+        max_iter: field.max_iter,
+        values: field.values,
+    }
+}
+
+/// Sample a Julia escape-time field for fixed `c = (cx, cy)`.
+#[napi]
+pub fn julia(
+    width: u32,
+    height: u32,
+    center_x: f64,
+    center_y: f64,
+    scale: f64,
+    cx: f64,
+    cy: f64,
+    max_iter: u32,
+) -> EscapeField {
+    let field = julia_core(
+        clamp_side(width),
+        clamp_side(height),
+        center_x,
+        center_y,
+        scale,
+        cx,
+        cy,
+        max_iter.max(1),
+    );
+    EscapeField {
+        width: field.width,
+        height: field.height,
+        max_iter: field.max_iter,
+        values: field.values,
     }
 }

@@ -38,6 +38,14 @@ if (fern.points[0].x !== fernAgain.points[0].x || fern.points[0].y !== fernAgain
     throw new Error("growFern seed is not deterministic");
 }
 
+const field = binding.mandelbrot(48, 32, -0.5, 0.0, 3.0, 60);
+if (field.width !== 48 || field.height !== 32 || field.values.length !== 48 * 32) {
+    throw new Error(`mandelbrot smoke failed: ${JSON.stringify({ w: field.width, h: field.height, n: field.values?.length })}`);
+}
+if (field.values[16 * 48 + 24] !== 60) {
+    throw new Error(`mandelbrot interior expected maxIter, got ${field.values[16 * 48 + 24]}`);
+}
+
 /** Mirrors `@doki-land/fractal` `toSvgPolyline` (compute ≠ paint). */
 function toSvgPolyline(points, padding = 16) {
     if (points.length === 0) return { points: "", viewBox: "0 0 100 100" };
@@ -70,5 +78,6 @@ console.log("smoke ok", {
     sourceLength: plant.sourceLength,
     pointCount: plant.points.length,
     fernCount: fern.count,
+    mandelbrot: `${field.width}x${field.height}`,
     viewBox: svg.viewBox,
 });
