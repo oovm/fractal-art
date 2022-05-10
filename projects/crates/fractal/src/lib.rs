@@ -1,9 +1,11 @@
+mod audio;
 mod errors;
 mod escape;
 mod ifs;
 mod rewrite;
 mod turtle;
 
+pub use audio::{NoteEvent, grow_melody};
 pub use errors::{Error, Result};
 pub use escape::{EscapeField, julia, mandelbrot};
 pub use ifs::{Affine2, barnsley_fern, chaos_game, grow_fern};

@@ -1,4 +1,4 @@
-use fractal::{Point, RewriteRule, grow_fern, mandelbrot, points_to_polyline, rewrite, turtle_path};
+use fractal::{Point, RewriteRule, grow_fern, grow_melody, mandelbrot, points_to_polyline, rewrite, turtle_path};
 
 #[test]
 fn ready() {
@@ -53,4 +53,17 @@ fn mandelbrot_marks_cardioid_interior() {
     assert_eq!(field.values[cy * 64 + cx], 80);
     // Far left of the set escapes quickly.
     assert!(field.values[cy * 64 + 0] < 10);
+}
+
+#[test]
+fn grow_melody_is_deterministic_and_timed() {
+    let a = grow_melody(2, 120.0, 60);
+    let b = grow_melody(2, 120.0, 60);
+    assert_eq!(a, b);
+    assert!(!a.is_empty());
+    assert!(a[0].time >= 0.0);
+    for w in a.windows(2) {
+        assert!(w[1].time >= w[0].time);
+    }
+    assert!(a.iter().all(|n| n.midi >= 12 && n.midi <= 108));
 }
