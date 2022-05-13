@@ -1,9 +1,9 @@
 //! Browser WASM export surface for the homepage demo.
-//! Compute only: rewrite + turtle / IFS / escape fields. SVG/Canvas rendering stays in TypeScript.
+//! Compute only: rewrite + turtle / IFS / escape / note events. SVG/Canvas/WebAudio stays in TypeScript.
 
 use fractal::{
-    RewriteRule, grow_fern as grow_fern_core, julia as julia_core, mandelbrot as mandelbrot_core,
-    rewrite, turtle_path,
+    RewriteRule, grow_fern as grow_fern_core, grow_melody as grow_melody_core,
+    julia as julia_core, mandelbrot as mandelbrot_core, rewrite, turtle_path,
 };
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
@@ -39,6 +39,22 @@ struct EscapeField {
     height: u32,
     max_iter: u32,
     values: Vec<u16>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct NoteEventJs {
+    time: f64,
+    midi: u8,
+    duration: f64,
+    velocity: f32,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct Melody {
+    events: Vec<NoteEventJs>,
+    count: usize,
 }
 
 fn clamp_side(side: u32) -> u32 {
@@ -145,6 +161,25 @@ pub fn julia(
         height: field.height,
         max_iter: field.max_iter,
         values: field.values,
+    };
+    serde_wasm_bindgen::to_value(&payload).map_err(js_err)
+}
+
+/// Grow an L-system melody as discrete note events (no PCM bake-in).
+#[wasm_bindgen(js_name = growMelody)]
+pub fn grow_melody(iterations: u32, tempo_bpm: f64, seed_midi: u32) -> Result<JsValue, JsValue> {
+    let events = grow_melody_core(iterations as usize, tempo_bpm, seed_midi.clamp(12, 108) as u8);
+    let payload = Melody {
+        count: events.len(),
+        events: events
+            .iter()
+            .map(|e| NoteEventJs {
+                time: e.time,
+                midi: e.midi,
+                duration: e.duration,
+                velocity: e.velocity,
+            })
+            .collect(),
     };
     serde_wasm_bindgen::to_value(&payload).map_err(js_err)
 }

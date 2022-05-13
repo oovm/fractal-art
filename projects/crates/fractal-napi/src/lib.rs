@@ -1,9 +1,9 @@
 //! Node-API export surface for `@doki-land/fractal`.
-//! Compute only: rewrite + turtle / IFS / escape fields. SVG/Canvas rendering stays in TypeScript.
+//! Compute only: rewrite + turtle / IFS / escape / note events. SVG/Canvas/WebAudio stays in TypeScript.
 
 use fractal::{
-    RewriteRule, grow_fern as grow_fern_core, julia as julia_core, mandelbrot as mandelbrot_core,
-    rewrite as rewrite_core, turtle_path,
+    RewriteRule, grow_fern as grow_fern_core, grow_melody as grow_melody_core,
+    julia as julia_core, mandelbrot as mandelbrot_core, rewrite as rewrite_core, turtle_path,
 };
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
@@ -36,6 +36,20 @@ pub struct EscapeField {
     pub height: u32,
     pub max_iter: u32,
     pub values: Vec<u16>,
+}
+
+#[napi(object)]
+pub struct NoteEvent {
+    pub time: f64,
+    pub midi: u32,
+    pub duration: f64,
+    pub velocity: f64,
+}
+
+#[napi(object)]
+pub struct Melody {
+    pub events: Vec<NoteEvent>,
+    pub count: u32,
 }
 
 fn clamp_side(side: u32) -> u32 {
@@ -138,5 +152,27 @@ pub fn julia(
         height: field.height,
         max_iter: field.max_iter,
         values: field.values,
+    }
+}
+
+/// Grow an L-system melody as discrete note events (no PCM bake-in).
+#[napi]
+pub fn grow_melody(iterations: u32, tempo_bpm: f64, seed_midi: u32) -> Melody {
+    let events = grow_melody_core(
+        iterations as usize,
+        tempo_bpm,
+        seed_midi.clamp(12, 108) as u8,
+    );
+    Melody {
+        count: events.len() as u32,
+        events: events
+            .iter()
+            .map(|e| NoteEvent {
+                time: e.time,
+                midi: e.midi as u32,
+                duration: e.duration,
+                velocity: e.velocity as f64,
+            })
+            .collect(),
     }
 }

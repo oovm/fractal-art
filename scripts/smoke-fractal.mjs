@@ -46,6 +46,18 @@ if (field.values[16 * 48 + 24] !== 60) {
     throw new Error(`mandelbrot interior expected maxIter, got ${field.values[16 * 48 + 24]}`);
 }
 
+const melody = binding.growMelody(2, 120, 60);
+if (!Array.isArray(melody.events) || melody.events.length < 1 || melody.count !== melody.events.length) {
+    throw new Error(`growMelody smoke failed: ${JSON.stringify({ count: melody.count, len: melody.events?.length })}`);
+}
+if (typeof melody.events[0].time !== "number" || typeof melody.events[0].midi !== "number") {
+    throw new Error(`growMelody event shape failed: ${JSON.stringify(melody.events[0])}`);
+}
+const melodyAgain = binding.growMelody(2, 120, 60);
+if (melody.events[0].midi !== melodyAgain.events[0].midi || melody.events[0].time !== melodyAgain.events[0].time) {
+    throw new Error("growMelody is not deterministic");
+}
+
 /** Mirrors `@doki-land/fractal` `toSvgPolyline` (compute ≠ paint). */
 function toSvgPolyline(points, padding = 16) {
     if (points.length === 0) return { points: "", viewBox: "0 0 100 100" };
@@ -79,5 +91,6 @@ console.log("smoke ok", {
     pointCount: plant.points.length,
     fernCount: fern.count,
     mandelbrot: `${field.width}x${field.height}`,
+    melodyCount: melody.count,
     viewBox: svg.viewBox,
 });
