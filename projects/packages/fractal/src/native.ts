@@ -20,6 +20,18 @@ export type EscapeField = {
     values: number[] | Uint16Array;
 };
 
+export type NoteEvent = {
+    time: number;
+    midi: number;
+    duration: number;
+    velocity: number;
+};
+
+export type Melody = {
+    events: NoteEvent[];
+    count: number;
+};
+
 type FractalBinding = {
     rewrite: (axiom: string, rules: string[], iterations: number) => string;
     growPlant: (iterations: number, step: number, turnDegrees: number) => {
@@ -58,6 +70,10 @@ type FractalBinding = {
         height: number;
         maxIter: number;
         values: number[] | Uint16Array;
+    };
+    growMelody: (iterations: number, tempoBpm: number, seedMidi: number) => {
+        events: NoteEvent[];
+        count: number;
     };
 };
 

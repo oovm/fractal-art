@@ -63,6 +63,14 @@ const field = mandelbrot(640, 400, -0.5, 0, 3, 120);
 console.log(field.width, field.height, field.values.length);
 ```
 
+```js
+import { growMelody } from "@doki-land/fractal";
+
+const melody = growMelody(3, 120, 60);
+// playMelody(melody) in a browser with Web Audio
+console.log(melody.count, melody.events[0]);
+```
+
 ## Web (homepage)
 
 ```bash

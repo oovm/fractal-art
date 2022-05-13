@@ -1,13 +1,13 @@
 /**
  * `@doki-land/fractal` — thin Node facade.
  *
- * Rust (NAPI) owns rewrite / turtle / IFS / escape geometry.
- * TypeScript owns SVG / Canvas rendering (`./render.js`).
+ * Rust (NAPI) owns rewrite / turtle / IFS / escape / note-event geometry.
+ * TypeScript owns SVG / Canvas / WebAudio (`./render.js`, `./audio.js`).
  *
  * Build the binding first: `pnpm build:napi`
  */
 
-export type { EscapeField, PlantPath, Point2, PointCloud } from "./native.js";
+export type { EscapeField, Melody, NoteEvent, PlantPath, Point2, PointCloud } from "./native.js";
 export { loadFractalNative } from "./native.js";
 export {
     fitBounds,
@@ -22,8 +22,14 @@ export {
     type FitBounds,
     type SvgPolyline,
 } from "./render.js";
+export {
+    playMelody,
+    type MelodyLike,
+    type NoteEventLike,
+    type PlayMelodyOptions,
+} from "./audio.js";
 
-import { loadFractalNative, type EscapeField, type PlantPath, type PointCloud } from "./native.js";
+import { loadFractalNative, type EscapeField, type Melody, type PlantPath, type PointCloud } from "./native.js";
 
 /** Parallel L-system rewrite. `rules` is a flat `[from, to, from, to, …]` list. */
 export function rewrite(axiom: string, rules: string[], iterations: number): string {
@@ -64,4 +70,9 @@ export function julia(
     maxIter = 120,
 ): EscapeField {
     return loadFractalNative().julia(width, height, centerX, centerY, scale, cx, cy, maxIter);
+}
+
+/** Grow an L-system melody as note events (play with `playMelody` in a browser). */
+export function growMelody(iterations = 3, tempoBpm = 120, seedMidi = 60): Melody {
+    return loadFractalNative().growMelody(iterations, tempoBpm, seedMidi);
 }
