@@ -1,0 +1,199 @@
+<template>
+  <Space direction="vertical" size="large" class="melody">
+    <Space wrap size="middle" class="toolbar">
+      <Field
+        label="Iterations"
+        type="number"
+        min="1"
+        max="5"
+        :value="iterationsText"
+        description="WASM builds note events; TypeScript plays them with Web Audio."
+        @input="onIterInput"
+      />
+      <Field
+        label="Tempo"
+        type="number"
+        min="60"
+        max="180"
+        step="10"
+        :value="tempoText"
+        @input="onTempoInput"
+      />
+      <Field
+        label="Seed MIDI"
+        type="number"
+        min="48"
+        max="72"
+        :value="seedText"
+        @input="onSeedInput"
+      />
+      <Space wrap size="small" class="actions">
+        <Button type="button" @click="play">Play</Button>
+        <Button type="button" variant="ghost" @click="reset">Reset</Button>
+      </Space>
+    </Space>
+
+    <Callout :tone="calloutTone" :title="calloutTitle" :description="status" />
+
+    <Typography variant="secondary">
+      Notes: {{ noteCount }} · Tempo: {{ tempo }} BPM · Root MIDI: {{ seedMidi }}
+    </Typography>
+  </Space>
+</template>
+
+<style>
+.toolbar {
+  align-items: flex-end;
+  width: 100%;
+}
+.actions {
+  align-items: center;
+  padding-bottom: 0.15rem;
+}
+</style>
+
+<script client>
+type NoteEvent = {
+  time: number;
+  midi: number;
+  duration: number;
+  velocity: number;
+};
+
+type Melody = {
+  events: NoteEvent[];
+  count: number;
+};
+
+type WasmModule = {
+  default: (input?: RequestInfo | URL | Response | BufferSource | WebAssembly.Module) => Promise<unknown>;
+  growMelody: (iterations: number, tempoBpm: number, seedMidi: number) => Melody;
+};
+
+function midiToHz(midi: number): number {
+  return 440 * 2 ** ((midi - 69) / 12);
+}
+
+/** TS playback: schedule oscillators from Rust note events (no PCM from WASM). */
+async function playMelody(melody: Melody, gain = 0.18): Promise<void> {
+  const AudioCtx =
+    window.AudioContext ||
+    (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!AudioCtx) throw new Error("Web Audio API unavailable");
+  const ctx = new AudioCtx();
+  const master = ctx.createGain();
+  master.gain.value = gain;
+  master.connect(ctx.destination);
+  const t0 = ctx.currentTime + 0.05;
+  let end = t0;
+  for (const e of melody.events) {
+    const start = t0 + Math.max(0, e.time);
+    const dur = Math.max(0.02, e.duration);
+    const stop = start + dur;
+    end = Math.max(end, stop);
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = midiToHz(e.midi);
+    const vel = Math.min(1, Math.max(0, e.velocity)) * gain;
+    g.gain.setValueAtTime(0, start);
+    g.gain.linearRampToValueAtTime(vel, start + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, stop);
+    osc.connect(g);
+    g.connect(master);
+    osc.start(start);
+    osc.stop(stop + 0.02);
+  }
+  await new Promise((r) => setTimeout(r, Math.ceil((end - ctx.currentTime) * 1000) + 50));
+  await ctx.close();
+}
+
+let wasmReady: Promise<WasmModule> | null = null;
+
+function loadWasm(): Promise<WasmModule> {
+  if (!wasmReady) {
+    wasmReady = import("/wasm/fractal_wasm.js").then(async (mod: WasmModule) => {
+      await mod.default("/wasm/fractal_wasm_bg.wasm");
+      return mod;
+    });
+  }
+  return wasmReady;
+}
+
+export default class MelodyPanel {
+  iterations = 3;
+  iterationsText = "3";
+  tempo = 120;
+  tempoText = "120";
+  seedMidi = 60;
+  seedText = "60";
+  noteCount = 0;
+  busy = false;
+  status = "Ready. Click Play to sample WASM events and hear Web Audio.";
+  calloutTone = "info";
+  calloutTitle = "Status";
+
+  async play() {
+    if (this.busy) return;
+    this.busy = true;
+    this.calloutTone = "info";
+    this.calloutTitle = "Playing";
+    this.status = "WASM builds the score; TypeScript schedules oscillators…";
+    try {
+      const wasm = await loadWasm();
+      const melody = wasm.growMelody(this.iterations, this.tempo, this.seedMidi);
+      this.noteCount = melody.count;
+      await playMelody(melody);
+      this.calloutTone = "success";
+      this.calloutTitle = `Melody · ${melody.count} notes`;
+      this.status = "Note events from Rust WASM · playback from TypeScript Web Audio.";
+    } catch (err) {
+      this.calloutTone = "danger";
+      this.calloutTitle = "Playback failed";
+      this.status = err instanceof Error ? err.message : String(err);
+    } finally {
+      this.busy = false;
+    }
+  }
+
+  onIterInput(event: Event) {
+    const target = event.target as HTMLInputElement | null;
+    if (!target) return;
+    const next = Number.parseInt(target.value, 10);
+    if (!Number.isFinite(next) || next < 1 || next > 5) return;
+    this.iterations = next;
+    this.iterationsText = String(next);
+  }
+
+  onTempoInput(event: Event) {
+    const target = event.target as HTMLInputElement | null;
+    if (!target) return;
+    const next = Number.parseInt(target.value, 10);
+    if (!Number.isFinite(next) || next < 60 || next > 180) return;
+    this.tempo = next;
+    this.tempoText = String(next);
+  }
+
+  onSeedInput(event: Event) {
+    const target = event.target as HTMLInputElement | null;
+    if (!target) return;
+    const next = Number.parseInt(target.value, 10);
+    if (!Number.isFinite(next) || next < 48 || next > 72) return;
+    this.seedMidi = next;
+    this.seedText = String(next);
+  }
+
+  reset() {
+    this.iterations = 3;
+    this.iterationsText = "3";
+    this.tempo = 120;
+    this.tempoText = "120";
+    this.seedMidi = 60;
+    this.seedText = "60";
+    this.noteCount = 0;
+    this.calloutTone = "info";
+    this.calloutTitle = "Status";
+    this.status = "Ready. Click Play to sample WASM events and hear Web Audio.";
+  }
+}
+</script>

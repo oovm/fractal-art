@@ -19,6 +19,12 @@
       >
         <EscapePanel />
       </Card>
+      <Card
+        title="L-system melody"
+        description="Note events from Rust WASM; TypeScript schedules Web Audio oscillators (no PCM bake-in)."
+      >
+        <MelodyPanel />
+      </Card>
     </Space>
   </AppShell>
 </template>
