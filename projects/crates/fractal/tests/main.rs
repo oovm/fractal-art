@@ -1,4 +1,7 @@
-use fractal::{Point, RewriteRule, grow_fern, grow_melody, mandelbrot, points_to_polyline, rewrite, turtle_path};
+use fractal::{
+    Point, RewriteRule, box_counting_dimension, grow_fern, grow_melody, mandelbrot,
+    points_to_polyline, rewrite, turtle_path,
+};
 
 #[test]
 fn ready() {
@@ -66,4 +69,11 @@ fn grow_melody_is_deterministic_and_timed() {
         assert!(w[1].time >= w[0].time);
     }
     assert!(a.iter().all(|n| n.midi >= 12 && n.midi <= 108));
+}
+
+#[test]
+fn box_counting_fern_is_between_one_and_two() {
+    let pts = grow_fern(8_000, 7);
+    let dim = box_counting_dimension(&pts, 2).expect("dimension");
+    assert!(dim > 1.0 && dim < 2.0, "dim={dim}");
 }

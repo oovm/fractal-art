@@ -1,3 +1,4 @@
+mod analysis;
 mod audio;
 mod errors;
 mod escape;
@@ -5,6 +6,7 @@ mod ifs;
 mod rewrite;
 mod turtle;
 
+pub use analysis::box_counting_dimension;
 pub use audio::{NoteEvent, grow_melody};
 pub use errors::{Error, Result};
 pub use escape::{EscapeField, julia, mandelbrot};
