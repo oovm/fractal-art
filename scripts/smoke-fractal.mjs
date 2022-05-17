@@ -58,6 +58,11 @@ if (melody.events[0].midi !== melodyAgain.events[0].midi || melody.events[0].tim
     throw new Error("growMelody is not deterministic");
 }
 
+const dim = binding.boxCountingDimension(fern.points, 2);
+if (typeof dim !== "number" || !(dim > 1 && dim < 2)) {
+    throw new Error(`boxCountingDimension smoke failed: ${dim}`);
+}
+
 /** Mirrors `@doki-land/fractal` `toSvgPolyline` (compute ≠ paint). */
 function toSvgPolyline(points, padding = 16) {
     if (points.length === 0) return { points: "", viewBox: "0 0 100 100" };
@@ -92,5 +97,6 @@ console.log("smoke ok", {
     fernCount: fern.count,
     mandelbrot: `${field.width}x${field.height}`,
     melodyCount: melody.count,
+    fernDim: dim,
     viewBox: svg.viewBox,
 });

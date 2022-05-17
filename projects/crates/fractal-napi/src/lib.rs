@@ -1,9 +1,10 @@
 //! Node-API export surface for `@doki-land/fractal`.
-//! Compute only: rewrite + turtle / IFS / escape / note events. SVG/Canvas/WebAudio stays in TypeScript.
+//! Compute only: rewrite + turtle / IFS / escape / note events / analysis. SVG/Canvas/WebAudio stays in TypeScript.
 
 use fractal::{
-    RewriteRule, grow_fern as grow_fern_core, grow_melody as grow_melody_core,
-    julia as julia_core, mandelbrot as mandelbrot_core, rewrite as rewrite_core, turtle_path,
+    RewriteRule, box_counting_dimension as box_counting_dimension_core,
+    grow_fern as grow_fern_core, grow_melody as grow_melody_core, julia as julia_core,
+    mandelbrot as mandelbrot_core, rewrite as rewrite_core, turtle_path, Point,
 };
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
@@ -175,4 +176,11 @@ pub fn grow_melody(iterations: u32, tempo_bpm: f64, seed_midi: u32) -> Melody {
             })
             .collect(),
     }
+}
+
+/// Box-counting fractal dimension for a 2D point cloud (`null` if degenerate).
+#[napi]
+pub fn box_counting_dimension(points: Vec<Point2>, min_boxes: u32) -> Option<f64> {
+    let mapped: Vec<Point> = points.iter().map(|p| Point { x: p.x, y: p.y }).collect();
+    box_counting_dimension_core(&mapped, min_boxes.max(2))
 }

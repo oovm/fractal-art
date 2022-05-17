@@ -1,9 +1,10 @@
 //! Browser WASM export surface for the homepage demo.
-//! Compute only: rewrite + turtle / IFS / escape / note events. SVG/Canvas/WebAudio stays in TypeScript.
+//! Compute only: rewrite + turtle / IFS / escape / note events / analysis. SVG/Canvas/WebAudio stays in TypeScript.
 
 use fractal::{
-    RewriteRule, grow_fern as grow_fern_core, grow_melody as grow_melody_core,
-    julia as julia_core, mandelbrot as mandelbrot_core, rewrite, turtle_path,
+    Point, RewriteRule, box_counting_dimension as box_counting_dimension_core,
+    grow_fern as grow_fern_core, grow_melody as grow_melody_core, julia as julia_core,
+    mandelbrot as mandelbrot_core, rewrite, turtle_path,
 };
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
@@ -182,6 +183,17 @@ pub fn grow_melody(iterations: u32, tempo_bpm: f64, seed_midi: u32) -> Result<Js
             .collect(),
     };
     serde_wasm_bindgen::to_value(&payload).map_err(js_err)
+}
+
+/// Box-counting fractal dimension for a 2D point cloud (`null` if degenerate).
+#[wasm_bindgen(js_name = boxCountingDimension)]
+pub fn box_counting_dimension(points: JsValue, min_boxes: u32) -> Result<JsValue, JsValue> {
+    let raw: Vec<PointJs> = serde_wasm_bindgen::from_value(points).map_err(js_err)?;
+    let mapped: Vec<Point> = raw.iter().map(|p| Point { x: p.x, y: p.y }).collect();
+    match box_counting_dimension_core(&mapped, min_boxes.max(2)) {
+        Some(dim) => Ok(JsValue::from_f64(dim)),
+        None => Ok(JsValue::NULL),
+    }
 }
 
 fn js_err(err: impl std::fmt::Display) -> JsValue {
