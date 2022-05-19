@@ -1,7 +1,7 @@
 /**
  * `@doki-land/fractal` — thin Node facade.
  *
- * Rust (NAPI) owns rewrite / turtle / IFS / escape / note-event geometry.
+ * Rust (NAPI) owns rewrite / turtle / IFS / escape / note-event / analysis geometry.
  * TypeScript owns SVG / Canvas / WebAudio (`./render.js`, `./audio.js`).
  *
  * Build the binding first: `pnpm build:napi`
@@ -75,4 +75,12 @@ export function julia(
 /** Grow an L-system melody as note events (play with `playMelody` in a browser). */
 export function growMelody(iterations = 3, tempoBpm = 120, seedMidi = 60): Melody {
     return loadFractalNative().growMelody(iterations, tempoBpm, seedMidi);
+}
+
+/** Box-counting fractal dimension for a 2D point cloud (`null` if degenerate). */
+export function boxCountingDimension(
+    points: { x: number; y: number }[],
+    minBoxes = 2,
+): number | null {
+    return loadFractalNative().boxCountingDimension(points, minBoxes);
 }

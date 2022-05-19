@@ -71,6 +71,13 @@ const melody = growMelody(3, 120, 60);
 console.log(melody.count, melody.events[0]);
 ```
 
+```js
+import { boxCountingDimension, growFern } from "@doki-land/fractal";
+
+const fern = growFern(20_000, 1);
+console.log(boxCountingDimension(fern.points));
+```
+
 ## Web (homepage)
 
 ```bash

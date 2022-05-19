@@ -75,6 +75,7 @@ type FractalBinding = {
         events: NoteEvent[];
         count: number;
     };
+    boxCountingDimension: (points: Point2[], minBoxes: number) => number | null;
 };
 
 /** Platform package map — same shape as `@doki-land/nifty-<platform>`. */
