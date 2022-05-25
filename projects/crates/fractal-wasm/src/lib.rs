@@ -6,13 +6,13 @@ use fractal::{
     grow_fern as grow_fern_core, grow_melody as grow_melody_core, julia as julia_core,
     mandelbrot as mandelbrot_core, rewrite, turtle_path,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
 const PLANT_TO: &str = "FF+[+F-F-F]-[-F+F+F]";
 const MAX_FIELD_SIDE: u32 = 1024;
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 struct PointJs {
     x: f64,
     y: f64,
