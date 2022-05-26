@@ -1,12 +1,7 @@
 use fractal::{
-    Point, RewriteRule, box_counting_dimension, grow_fern, grow_melody, mandelbrot,
+    Point, RewriteRule, box_counting_dimension, grow_fern, grow_melody, julia, mandelbrot,
     points_to_polyline, rewrite, turtle_path,
 };
-
-#[test]
-fn ready() {
-    println!("it works!")
-}
 
 #[test]
 fn algae_rewrites_like_lindenmayer() {
@@ -50,12 +45,18 @@ fn mandelbrot_marks_cardioid_interior() {
     assert_eq!(field.width, 64);
     assert_eq!(field.height, 48);
     assert_eq!(field.values.len(), 64 * 48);
-    // Near c = 0 the orbit stays bounded → hits max_iter.
     let cx = 32_usize;
     let cy = 24_usize;
     assert_eq!(field.values[cy * 64 + cx], 80);
-    // Far left of the set escapes quickly.
     assert!(field.values[cy * 64 + 0] < 10);
+}
+
+#[test]
+fn julia_has_interior_and_exterior() {
+    let field = julia(48, 36, 0.0, 0.0, 3.0, -0.8, 0.156, 60);
+    assert_eq!(field.values.len(), 48 * 36);
+    assert!(field.values.iter().any(|&v| v < 60));
+    assert!(field.values.iter().any(|&v| v == 60));
 }
 
 #[test]
@@ -76,4 +77,11 @@ fn box_counting_fern_is_between_one_and_two() {
     let pts = grow_fern(8_000, 7);
     let dim = box_counting_dimension(&pts, 2).expect("dimension");
     assert!(dim > 1.0 && dim < 2.0, "dim={dim}");
+}
+
+#[test]
+fn box_counting_rejects_degenerate_clouds() {
+    assert!(box_counting_dimension(&[], 2).is_none());
+    assert!(box_counting_dimension(&[Point { x: 1.0, y: 1.0 }], 2).is_none());
+    assert!(box_counting_dimension(&[Point { x: 0.0, y: 0.0 }, Point { x: 0.0, y: 0.0 }], 2).is_none());
 }
