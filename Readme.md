@@ -33,8 +33,7 @@ projects/
 ```bash
 pnpm install
 pnpm build:napi
-cargo test --release -p fractal
-pnpm test:napi
+pnpm test
 ```
 
 ## Node

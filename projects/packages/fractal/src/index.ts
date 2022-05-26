@@ -2,13 +2,13 @@
  * `@doki-land/fractal` — thin Node facade.
  *
  * Rust (NAPI) owns rewrite / turtle / IFS / escape / note-event / analysis geometry.
- * TypeScript owns SVG / Canvas / WebAudio (`./render.js`, `./audio.js`).
+ * TypeScript owns SVG / Canvas / WebAudio (`./render.ts`, `./audio.ts`).
  *
  * Build the binding first: `pnpm build:napi`
  */
 
-export type { EscapeField, Melody, NoteEvent, PlantPath, Point2, PointCloud } from "./native.js";
-export { loadFractalNative } from "./native.js";
+export type { EscapeField, Melody, NoteEvent, PlantPath, Point2, PointCloud } from "./native.ts";
+export { loadFractalNative } from "./native.ts";
 export {
     fitBounds,
     paintEscapeField,
@@ -21,15 +21,15 @@ export {
     type EscapePaintOptions,
     type FitBounds,
     type SvgPolyline,
-} from "./render.js";
+} from "./render.ts";
 export {
     playMelody,
     type MelodyLike,
     type NoteEventLike,
     type PlayMelodyOptions,
-} from "./audio.js";
+} from "./audio.ts";
 
-import { loadFractalNative, type EscapeField, type Melody, type PlantPath, type PointCloud } from "./native.js";
+import { loadFractalNative, type EscapeField, type Melody, type PlantPath, type PointCloud } from "./native.ts";
 
 /** Parallel L-system rewrite. `rules` is a flat `[from, to, from, to, …]` list. */
 export function rewrite(axiom: string, rules: string[], iterations: number): string {
