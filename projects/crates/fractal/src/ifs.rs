@@ -68,6 +68,39 @@ pub fn barnsley_fern() -> [Affine2; 4] {
     ]
 }
 
+/// Classic Sierpiński gasket IFS (3 equal-weight maps).
+pub fn sierpinski() -> [Affine2; 3] {
+    [
+        Affine2 {
+            a: 0.5,
+            b: 0.0,
+            c: 0.0,
+            d: 0.5,
+            e: 0.0,
+            f: 0.0,
+            weight: 1.0,
+        },
+        Affine2 {
+            a: 0.5,
+            b: 0.0,
+            c: 0.0,
+            d: 0.5,
+            e: 0.5,
+            f: 0.0,
+            weight: 1.0,
+        },
+        Affine2 {
+            a: 0.5,
+            b: 0.0,
+            c: 0.0,
+            d: 0.5,
+            e: 0.25,
+            f: 0.433_012_701_892_219_3, // √3 / 4
+            weight: 1.0,
+        },
+    ]
+}
+
 /// Tiny deterministic LCG so tests and demos stay reproducible without `rand`.
 #[derive(Debug, Clone, Copy)]
 struct Lcg(u64);
@@ -79,8 +112,8 @@ impl Lcg {
     }
 }
 
-/// Chaos-game sample of an IFS. Discards the first `burn_in` iterates.
-pub fn chaos_game(maps: &[Affine2], iterations: usize, seed: u64, burn_in: usize) -> Vec<Point> {
+/// Chaos-game sample of an arbitrary IFS. Discards the first `burn_in` iterates.
+pub fn sample_ifs(maps: &[Affine2], iterations: usize, seed: u64, burn_in: usize) -> Vec<Point> {
     if maps.is_empty() || iterations == 0 {
         return Vec::new();
     }
@@ -114,5 +147,10 @@ pub fn chaos_game(maps: &[Affine2], iterations: usize, seed: u64, burn_in: usize
 
 /// Sample the classic Barnsley fern (geometry only).
 pub fn grow_fern(iterations: usize, seed: u64) -> Vec<Point> {
-    chaos_game(&barnsley_fern(), iterations, seed, 20)
+    sample_ifs(&barnsley_fern(), iterations, seed, 20)
+}
+
+/// Sample the classic Sierpiński gasket (geometry only).
+pub fn grow_sierpinski(iterations: usize, seed: u64) -> Vec<Point> {
+    sample_ifs(&sierpinski(), iterations, seed, 20)
 }

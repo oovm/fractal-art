@@ -1,6 +1,6 @@
 use fractal::{
-    Point, RewriteRule, box_counting_dimension, grow_fern, grow_melody, julia, mandelbrot,
-    points_to_polyline, rewrite, turtle_path,
+    Point, RewriteRule, barnsley_fern, box_counting_dimension, grow_fern, grow_melody,
+    grow_sierpinski, julia, mandelbrot, points_to_polyline, rewrite, sample_ifs, turtle_path,
 };
 
 #[test]
@@ -84,4 +84,25 @@ fn box_counting_rejects_degenerate_clouds() {
     assert!(box_counting_dimension(&[], 2).is_none());
     assert!(box_counting_dimension(&[Point { x: 1.0, y: 1.0 }], 2).is_none());
     assert!(box_counting_dimension(&[Point { x: 0.0, y: 0.0 }, Point { x: 0.0, y: 0.0 }], 2).is_none());
+}
+
+#[test]
+fn sample_ifs_matches_grow_fern_for_barnsley_maps() {
+    let via_sample = sample_ifs(&barnsley_fern(), 1_500, 11, 20);
+    let via_fern = grow_fern(1_500, 11);
+    assert_eq!(via_sample, via_fern);
+}
+
+#[test]
+fn grow_sierpinski_is_deterministic_and_bounded() {
+    let a = grow_sierpinski(3_000, 3);
+    let b = grow_sierpinski(3_000, 3);
+    assert_eq!(a, b);
+    assert_eq!(a.len(), 3_000);
+    let min_x = a.iter().map(|p| p.x).fold(f64::INFINITY, f64::min);
+    let max_x = a.iter().map(|p| p.x).fold(f64::NEG_INFINITY, f64::max);
+    let min_y = a.iter().map(|p| p.y).fold(f64::INFINITY, f64::min);
+    let max_y = a.iter().map(|p| p.y).fold(f64::NEG_INFINITY, f64::max);
+    assert!(min_x >= -0.05 && max_x <= 1.05, "x in [{min_x}, {max_x}]");
+    assert!(min_y >= -0.05 && max_y <= 1.0, "y in [{min_y}, {max_y}]");
 }
