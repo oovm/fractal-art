@@ -2,9 +2,10 @@
 //! Compute only: rewrite + turtle / IFS / escape / note events / analysis. SVG/Canvas/WebAudio stays in TypeScript.
 
 use fractal::{
-    Point, RewriteRule, box_counting_dimension as box_counting_dimension_core,
-    grow_fern as grow_fern_core, grow_melody as grow_melody_core, julia as julia_core,
-    mandelbrot as mandelbrot_core, rewrite, turtle_path,
+    Affine2, Point, RewriteRule, box_counting_dimension as box_counting_dimension_core,
+    grow_fern as grow_fern_core, grow_melody as grow_melody_core,
+    grow_sierpinski as grow_sierpinski_core, julia as julia_core, mandelbrot as mandelbrot_core,
+    rewrite, sample_ifs as sample_ifs_core, turtle_path,
 };
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -16,6 +17,17 @@ const MAX_FIELD_SIDE: u32 = 1024;
 struct PointJs {
     x: f64,
     y: f64,
+}
+
+#[derive(Deserialize)]
+struct Affine2Js {
+    a: f64,
+    b: f64,
+    c: f64,
+    d: f64,
+    e: f64,
+    f: f64,
+    weight: f64,
 }
 
 #[derive(Serialize)]
@@ -101,6 +113,46 @@ pub fn grow_plant(iterations: u32, step: f64, turn_degrees: f64) -> Result<JsVal
 #[wasm_bindgen(js_name = growFern)]
 pub fn grow_fern(iterations: u32, seed: u32) -> Result<JsValue, JsValue> {
     let path = grow_fern_core(iterations as usize, seed as u64);
+    let payload = PointCloud {
+        count: path.len(),
+        points: path.iter().map(|p| PointJs { x: p.x, y: p.y }).collect(),
+    };
+    serde_wasm_bindgen::to_value(&payload).map_err(js_err)
+}
+
+/// Sample an arbitrary IFS via the chaos game (geometry only).
+#[wasm_bindgen(js_name = sampleIfs)]
+pub fn sample_ifs(
+    maps: JsValue,
+    iterations: u32,
+    seed: u32,
+    burn_in: u32,
+) -> Result<JsValue, JsValue> {
+    let raw: Vec<Affine2Js> = serde_wasm_bindgen::from_value(maps).map_err(js_err)?;
+    let mapped: Vec<Affine2> = raw
+        .iter()
+        .map(|m| Affine2 {
+            a: m.a,
+            b: m.b,
+            c: m.c,
+            d: m.d,
+            e: m.e,
+            f: m.f,
+            weight: m.weight,
+        })
+        .collect();
+    let path = sample_ifs_core(&mapped, iterations as usize, seed as u64, burn_in as usize);
+    let payload = PointCloud {
+        count: path.len(),
+        points: path.iter().map(|p| PointJs { x: p.x, y: p.y }).collect(),
+    };
+    serde_wasm_bindgen::to_value(&payload).map_err(js_err)
+}
+
+/// Sample the classic Sierpiński gasket IFS (geometry only).
+#[wasm_bindgen(js_name = growSierpinski)]
+pub fn grow_sierpinski(iterations: u32, seed: u32) -> Result<JsValue, JsValue> {
+    let path = grow_sierpinski_core(iterations as usize, seed as u64);
     let payload = PointCloud {
         count: path.len(),
         points: path.iter().map(|p| PointJs { x: p.x, y: p.y }).collect(),

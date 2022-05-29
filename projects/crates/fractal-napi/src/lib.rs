@@ -2,9 +2,10 @@
 //! Compute only: rewrite + turtle / IFS / escape / note events / analysis. SVG/Canvas/WebAudio stays in TypeScript.
 
 use fractal::{
-    RewriteRule, box_counting_dimension as box_counting_dimension_core,
-    grow_fern as grow_fern_core, grow_melody as grow_melody_core, julia as julia_core,
-    mandelbrot as mandelbrot_core, rewrite as rewrite_core, turtle_path, Point,
+    Affine2, Point, RewriteRule, box_counting_dimension as box_counting_dimension_core,
+    grow_fern as grow_fern_core, grow_melody as grow_melody_core,
+    grow_sierpinski as grow_sierpinski_core, julia as julia_core, mandelbrot as mandelbrot_core,
+    rewrite as rewrite_core, sample_ifs as sample_ifs_core, turtle_path,
 };
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
@@ -29,6 +30,17 @@ pub struct PlantPath {
 pub struct PointCloud {
     pub points: Vec<Point2>,
     pub count: u32,
+}
+
+#[napi(object)]
+pub struct Affine2Js {
+    pub a: f64,
+    pub b: f64,
+    pub c: f64,
+    pub d: f64,
+    pub e: f64,
+    pub f: f64,
+    pub weight: f64,
 }
 
 #[napi(object)]
@@ -94,6 +106,38 @@ pub fn grow_plant(iterations: u32, step: f64, turn_degrees: f64) -> PlantPath {
 #[napi]
 pub fn grow_fern(iterations: u32, seed: u32) -> PointCloud {
     let path = grow_fern_core(iterations as usize, seed as u64);
+    PointCloud {
+        count: path.len() as u32,
+        points: path.iter().map(|p| Point2 { x: p.x, y: p.y }).collect(),
+    }
+}
+
+/// Sample an arbitrary IFS via the chaos game (geometry only).
+#[napi]
+pub fn sample_ifs(maps: Vec<Affine2Js>, iterations: u32, seed: u32, burn_in: u32) -> PointCloud {
+    let mapped: Vec<Affine2> = maps
+        .iter()
+        .map(|m| Affine2 {
+            a: m.a,
+            b: m.b,
+            c: m.c,
+            d: m.d,
+            e: m.e,
+            f: m.f,
+            weight: m.weight,
+        })
+        .collect();
+    let path = sample_ifs_core(&mapped, iterations as usize, seed as u64, burn_in as usize);
+    PointCloud {
+        count: path.len() as u32,
+        points: path.iter().map(|p| Point2 { x: p.x, y: p.y }).collect(),
+    }
+}
+
+/// Sample the classic Sierpiński gasket IFS (geometry only).
+#[napi]
+pub fn grow_sierpinski(iterations: u32, seed: u32) -> PointCloud {
+    let path = grow_sierpinski_core(iterations as usize, seed as u64);
     PointCloud {
         count: path.len() as u32,
         points: path.iter().map(|p| Point2 { x: p.x, y: p.y }).collect(),
