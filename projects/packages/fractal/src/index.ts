@@ -7,7 +7,7 @@
  * Build the binding first: `pnpm build:napi`
  */
 
-export type { EscapeField, Melody, NoteEvent, PlantPath, Point2, PointCloud } from "./native.ts";
+export type { Affine2, EscapeField, Melody, NoteEvent, PlantPath, Point2, PointCloud } from "./native.ts";
 export { loadFractalNative } from "./native.ts";
 export {
     fitBounds,
@@ -29,7 +29,14 @@ export {
     type PlayMelodyOptions,
 } from "./audio.ts";
 
-import { loadFractalNative, type EscapeField, type Melody, type PlantPath, type PointCloud } from "./native.ts";
+import {
+    loadFractalNative,
+    type Affine2,
+    type EscapeField,
+    type Melody,
+    type PlantPath,
+    type PointCloud,
+} from "./native.ts";
 
 /** Parallel L-system rewrite. `rules` is a flat `[from, to, from, to, …]` list. */
 export function rewrite(axiom: string, rules: string[], iterations: number): string {
@@ -44,6 +51,21 @@ export function growPlant(iterations: number, step = 8, turnDegrees = 25): Plant
 /** Sample the classic Barnsley fern IFS (geometry only; paint with `plotCanvas`). */
 export function growFern(iterations = 50_000, seed = 1): PointCloud {
     return loadFractalNative().growFern(iterations, seed);
+}
+
+/** Sample an arbitrary IFS via the chaos game (geometry only). */
+export function sampleIfs(
+    maps: Affine2[],
+    iterations = 50_000,
+    seed = 1,
+    burnIn = 20,
+): PointCloud {
+    return loadFractalNative().sampleIfs(maps, iterations, seed, burnIn);
+}
+
+/** Sample the classic Sierpiński gasket IFS (geometry only). */
+export function growSierpinski(iterations = 50_000, seed = 1): PointCloud {
+    return loadFractalNative().growSierpinski(iterations, seed);
 }
 
 /** Sample a Mandelbrot escape-time field (paint with `paintEscapeField`). */

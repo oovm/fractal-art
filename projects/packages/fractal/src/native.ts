@@ -13,6 +13,16 @@ export type PointCloud = {
     count: number;
 };
 
+export type Affine2 = {
+    a: number;
+    b: number;
+    c: number;
+    d: number;
+    e: number;
+    f: number;
+    weight: number;
+};
+
 export type EscapeField = {
     width: number;
     height: number;
@@ -40,6 +50,19 @@ type FractalBinding = {
         sourceLength: number;
     };
     growFern: (iterations: number, seed: number) => {
+        points: Point2[];
+        count: number;
+    };
+    sampleIfs: (
+        maps: Affine2[],
+        iterations: number,
+        seed: number,
+        burnIn: number,
+    ) => {
+        points: Point2[];
+        count: number;
+    };
+    growSierpinski: (iterations: number, seed: number) => {
         points: Point2[];
         count: number;
     };

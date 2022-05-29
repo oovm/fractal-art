@@ -5,11 +5,21 @@ import {
     growFern,
     growMelody,
     growPlant,
+    growSierpinski,
     julia,
     mandelbrot,
     rewrite,
+    sampleIfs,
     toSvgPolyline,
 } from "../src/index.ts";
+
+/** Classic Barnsley fern maps — same coefficients as the Rust preset. */
+const BARNSLEY = [
+    { a: 0.0, b: 0.0, c: 0.0, d: 0.16, e: 0.0, f: 0.0, weight: 0.01 },
+    { a: 0.85, b: 0.04, c: -0.04, d: 0.85, e: 0.0, f: 1.6, weight: 0.85 },
+    { a: 0.2, b: -0.26, c: 0.23, d: 0.22, e: 0.0, f: 1.6, weight: 0.07 },
+    { a: -0.15, b: 0.28, c: 0.26, d: 0.24, e: 0.0, f: 0.44, weight: 0.07 },
+];
 
 describe("rewrite / growPlant", () => {
     it("rewrites algae like Lindenmayer", () => {
@@ -37,6 +47,32 @@ describe("growFern", () => {
         assert.equal(a.points[0].y, b.points[0].y);
         const other = growFern(5_000, 99);
         assert.notEqual(a.points[0].x, other.points[0].x);
+    });
+});
+
+describe("sampleIfs / growSierpinski", () => {
+    it("matches growFern when given Barnsley maps", () => {
+        const viaSample = sampleIfs(BARNSLEY, 2_000, 11, 20);
+        const viaFern = growFern(2_000, 11);
+        assert.equal(viaSample.count, viaFern.count);
+        assert.equal(viaSample.points[0].x, viaFern.points[0].x);
+        assert.equal(viaSample.points[0].y, viaFern.points[0].y);
+        assert.equal(
+            viaSample.points[viaSample.points.length - 1].x,
+            viaFern.points[viaFern.points.length - 1].x,
+        );
+    });
+
+    it("samples a deterministic Sierpiński cloud", () => {
+        const a = growSierpinski(3_000, 3);
+        const b = growSierpinski(3_000, 3);
+        assert.equal(a.count, 3_000);
+        assert.equal(a.points[0].x, b.points[0].x);
+        assert.equal(a.points[0].y, b.points[0].y);
+        for (const p of a.points) {
+            assert.ok(p.x >= -0.05 && p.x <= 1.05);
+            assert.ok(p.y >= -0.05 && p.y <= 1.0);
+        }
     });
 });
 

@@ -55,6 +55,14 @@ console.log(fern.count);
 ```
 
 ```js
+import { growSierpinski, sampleIfs } from "@doki-land/fractal";
+
+const gasket = growSierpinski(40_000, 3);
+console.log(gasket.count);
+// sampleIfs(customMaps, iterations, seed, burnIn) for arbitrary affine IFS
+```
+
+```js
 import { mandelbrot, paintEscapeField } from "@doki-land/fractal";
 
 const field = mandelbrot(640, 400, -0.5, 0, 3, 120);
