@@ -14,6 +14,12 @@
         <FernPanel />
       </Card>
       <Card
+        title="Sierpiński gasket (IFS)"
+        description="Generic IFS surface dogfood: `growSierpinski` preset on the same `sampleIfs` engine."
+      >
+        <SierpinskiPanel />
+      </Card>
+      <Card
         title="Escape time (Mandelbrot / Julia)"
         description="Iteration fields from Rust WASM; TypeScript maps values to ImageData. Type `mandelbrot` or `julia` in Family."
       >
