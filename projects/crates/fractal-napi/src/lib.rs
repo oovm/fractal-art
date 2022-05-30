@@ -1,11 +1,13 @@
 //! Node-API export surface for `@doki-land/fractal`.
-//! Compute only: rewrite + turtle / IFS / escape / note events / analysis. SVG/Canvas/WebAudio stays in TypeScript.
+//! Compute only: rewrite + turtle / IFS / dynamics / escape / note events / analysis.
+//! SVG/Canvas/WebAudio stays in TypeScript.
 
 use fractal::{
     Affine2, Point, RewriteRule, box_counting_dimension as box_counting_dimension_core,
     grow_fern as grow_fern_core, grow_melody as grow_melody_core,
     grow_sierpinski as grow_sierpinski_core, julia as julia_core, mandelbrot as mandelbrot_core,
-    rewrite as rewrite_core, sample_ifs as sample_ifs_core, turtle_path,
+    rewrite as rewrite_core, sample_clifford as sample_clifford_core,
+    sample_dejong as sample_dejong_core, sample_ifs as sample_ifs_core, turtle_path,
 };
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
@@ -138,6 +140,40 @@ pub fn sample_ifs(maps: Vec<Affine2Js>, iterations: u32, seed: u32, burn_in: u32
 #[napi]
 pub fn grow_sierpinski(iterations: u32, seed: u32) -> PointCloud {
     let path = grow_sierpinski_core(iterations as usize, seed as u64);
+    PointCloud {
+        count: path.len() as u32,
+        points: path.iter().map(|p| Point2 { x: p.x, y: p.y }).collect(),
+    }
+}
+
+/// Sample a Clifford attractor point cloud (geometry only).
+#[napi]
+pub fn sample_clifford(
+    a: f64,
+    b: f64,
+    c: f64,
+    d: f64,
+    iterations: u32,
+    burn_in: u32,
+) -> PointCloud {
+    let path = sample_clifford_core(a, b, c, d, iterations as usize, burn_in as usize);
+    PointCloud {
+        count: path.len() as u32,
+        points: path.iter().map(|p| Point2 { x: p.x, y: p.y }).collect(),
+    }
+}
+
+/// Sample a Peter de Jong attractor point cloud (geometry only).
+#[napi]
+pub fn sample_dejong(
+    a: f64,
+    b: f64,
+    c: f64,
+    d: f64,
+    iterations: u32,
+    burn_in: u32,
+) -> PointCloud {
+    let path = sample_dejong_core(a, b, c, d, iterations as usize, burn_in as usize);
     PointCloud {
         count: path.len() as u32,
         points: path.iter().map(|p| Point2 { x: p.x, y: p.y }).collect(),

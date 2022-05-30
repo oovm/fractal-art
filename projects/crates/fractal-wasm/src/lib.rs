@@ -1,11 +1,13 @@
 //! Browser WASM export surface for the homepage demo.
-//! Compute only: rewrite + turtle / IFS / escape / note events / analysis. SVG/Canvas/WebAudio stays in TypeScript.
+//! Compute only: rewrite + turtle / IFS / dynamics / escape / note events / analysis.
+//! SVG/Canvas/WebAudio stays in TypeScript.
 
 use fractal::{
     Affine2, Point, RewriteRule, box_counting_dimension as box_counting_dimension_core,
     grow_fern as grow_fern_core, grow_melody as grow_melody_core,
     grow_sierpinski as grow_sierpinski_core, julia as julia_core, mandelbrot as mandelbrot_core,
-    rewrite, sample_ifs as sample_ifs_core, turtle_path,
+    rewrite, sample_clifford as sample_clifford_core, sample_dejong as sample_dejong_core,
+    sample_ifs as sample_ifs_core, turtle_path,
 };
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -153,6 +155,42 @@ pub fn sample_ifs(
 #[wasm_bindgen(js_name = growSierpinski)]
 pub fn grow_sierpinski(iterations: u32, seed: u32) -> Result<JsValue, JsValue> {
     let path = grow_sierpinski_core(iterations as usize, seed as u64);
+    let payload = PointCloud {
+        count: path.len(),
+        points: path.iter().map(|p| PointJs { x: p.x, y: p.y }).collect(),
+    };
+    serde_wasm_bindgen::to_value(&payload).map_err(js_err)
+}
+
+/// Sample a Clifford attractor point cloud (geometry only).
+#[wasm_bindgen(js_name = sampleClifford)]
+pub fn sample_clifford(
+    a: f64,
+    b: f64,
+    c: f64,
+    d: f64,
+    iterations: u32,
+    burn_in: u32,
+) -> Result<JsValue, JsValue> {
+    let path = sample_clifford_core(a, b, c, d, iterations as usize, burn_in as usize);
+    let payload = PointCloud {
+        count: path.len(),
+        points: path.iter().map(|p| PointJs { x: p.x, y: p.y }).collect(),
+    };
+    serde_wasm_bindgen::to_value(&payload).map_err(js_err)
+}
+
+/// Sample a Peter de Jong attractor point cloud (geometry only).
+#[wasm_bindgen(js_name = sampleDejong)]
+pub fn sample_dejong(
+    a: f64,
+    b: f64,
+    c: f64,
+    d: f64,
+    iterations: u32,
+    burn_in: u32,
+) -> Result<JsValue, JsValue> {
+    let path = sample_dejong_core(a, b, c, d, iterations as usize, burn_in as usize);
     let payload = PointCloud {
         count: path.len(),
         points: path.iter().map(|p| PointJs { x: p.x, y: p.y }).collect(),
