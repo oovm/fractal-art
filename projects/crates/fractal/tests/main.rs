@@ -1,6 +1,7 @@
 use fractal::{
-    Point, RewriteRule, barnsley_fern, box_counting_dimension, grow_fern, grow_melody,
-    grow_sierpinski, julia, mandelbrot, points_to_polyline, rewrite, sample_ifs, turtle_path,
+    Point, RewriteRule, barnsley_fern, box_counting_dimension, clifford_classic, grow_fern,
+    grow_melody, grow_sierpinski, julia, mandelbrot, points_to_polyline, rewrite, sample_clifford,
+    sample_dejong, sample_ifs, turtle_path,
 };
 
 #[test]
@@ -105,4 +106,24 @@ fn grow_sierpinski_is_deterministic_and_bounded() {
     let max_y = a.iter().map(|p| p.y).fold(f64::NEG_INFINITY, f64::max);
     assert!(min_x >= -0.05 && max_x <= 1.05, "x in [{min_x}, {max_x}]");
     assert!(min_y >= -0.05 && max_y <= 1.0, "y in [{min_y}, {max_y}]");
+}
+
+#[test]
+fn clifford_attractor_is_deterministic_and_bounded() {
+    let (a, b, c, d) = clifford_classic();
+    let pts = sample_clifford(a, b, c, d, 4_000, 50);
+    let again = sample_clifford(a, b, c, d, 4_000, 50);
+    assert_eq!(pts, again);
+    assert_eq!(pts.len(), 4_000);
+    for p in &pts {
+        assert!(p.x.is_finite() && p.y.is_finite());
+        assert!(p.x.abs() < 3.0 && p.y.abs() < 3.0, "({} {})", p.x, p.y);
+    }
+}
+
+#[test]
+fn dejong_attractor_is_deterministic_and_nonempty() {
+    let pts = sample_dejong(-2.0, -2.0, -1.2, 2.0, 2_000, 20);
+    assert_eq!(pts.len(), 2_000);
+    assert!(pts.iter().any(|p| p.x != pts[0].x || p.y != pts[0].y));
 }
