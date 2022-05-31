@@ -68,6 +68,30 @@ export function growSierpinski(iterations = 50_000, seed = 1): PointCloud {
     return loadFractalNative().growSierpinski(iterations, seed);
 }
 
+/** Sample a Clifford attractor (geometry only; paint with `plotCanvas`). */
+export function sampleClifford(
+    a = -1.4,
+    b = 1.6,
+    c = 1.0,
+    d = 0.7,
+    iterations = 50_000,
+    burnIn = 50,
+): PointCloud {
+    return loadFractalNative().sampleClifford(a, b, c, d, iterations, burnIn);
+}
+
+/** Sample a Peter de Jong attractor (geometry only; paint with `plotCanvas`). */
+export function sampleDejong(
+    a = -2.0,
+    b = -2.0,
+    c = -1.2,
+    d = 2.0,
+    iterations = 50_000,
+    burnIn = 20,
+): PointCloud {
+    return loadFractalNative().sampleDejong(a, b, c, d, iterations, burnIn);
+}
+
 /** Sample a Mandelbrot escape-time field (paint with `paintEscapeField`). */
 export function mandelbrot(
     width = 640,

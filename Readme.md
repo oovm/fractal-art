@@ -63,6 +63,14 @@ console.log(gasket.count);
 ```
 
 ```js
+import { sampleClifford, sampleDejong } from "@doki-land/fractal";
+
+const clifford = sampleClifford(-1.4, 1.6, 1.0, 0.7, 50_000);
+const dejong = sampleDejong(-2, -2, -1.2, 2, 50_000);
+console.log(clifford.count, dejong.count);
+```
+
+```js
 import { mandelbrot, paintEscapeField } from "@doki-land/fractal";
 
 const field = mandelbrot(640, 400, -0.5, 0, 3, 120);

@@ -9,6 +9,8 @@ import {
     julia,
     mandelbrot,
     rewrite,
+    sampleClifford,
+    sampleDejong,
     sampleIfs,
     toSvgPolyline,
 } from "../src/index.ts";
@@ -73,6 +75,26 @@ describe("sampleIfs / growSierpinski", () => {
             assert.ok(p.x >= -0.05 && p.x <= 1.05);
             assert.ok(p.y >= -0.05 && p.y <= 1.0);
         }
+    });
+});
+
+describe("sampleClifford / sampleDejong", () => {
+    it("samples a deterministic Clifford cloud", () => {
+        const a = sampleClifford(-1.4, 1.6, 1.0, 0.7, 4_000, 50);
+        const b = sampleClifford(-1.4, 1.6, 1.0, 0.7, 4_000, 50);
+        assert.equal(a.count, 4_000);
+        assert.equal(a.points[0].x, b.points[0].x);
+        assert.equal(a.points[0].y, b.points[0].y);
+        for (const p of a.points) {
+            assert.ok(Number.isFinite(p.x) && Number.isFinite(p.y));
+            assert.ok(Math.abs(p.x) < 3 && Math.abs(p.y) < 3);
+        }
+    });
+
+    it("samples a non-degenerate de Jong cloud", () => {
+        const cloud = sampleDejong(-2, -2, -1.2, 2, 2_000, 20);
+        assert.equal(cloud.count, 2_000);
+        assert.ok(cloud.points.some((p) => p.x !== cloud.points[0].x || p.y !== cloud.points[0].y));
     });
 });
 

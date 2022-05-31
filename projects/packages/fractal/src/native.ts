@@ -66,6 +66,28 @@ type FractalBinding = {
         points: Point2[];
         count: number;
     };
+    sampleClifford: (
+        a: number,
+        b: number,
+        c: number,
+        d: number,
+        iterations: number,
+        burnIn: number,
+    ) => {
+        points: Point2[];
+        count: number;
+    };
+    sampleDejong: (
+        a: number,
+        b: number,
+        c: number,
+        d: number,
+        iterations: number,
+        burnIn: number,
+    ) => {
+        points: Point2[];
+        count: number;
+    };
     mandelbrot: (
         width: number,
         height: number,
