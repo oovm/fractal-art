@@ -1,0 +1,241 @@
+<template>
+  <Space direction="vertical" size="large" class="attractor">
+    <Space wrap size="middle" class="toolbar">
+      <Field
+        label="Family"
+        :value="family"
+        description="Type `clifford` or `dejong`. WASM iterates the map; TypeScript plots."
+        @input="onFamilyInput"
+      />
+      <Field
+        label="Samples"
+        type="number"
+        min="5000"
+        max="120000"
+        step="5000"
+        :value="samplesText"
+        @input="onSamplesInput"
+      />
+      <Space wrap size="small" class="actions">
+        <Button type="button" @click="redraw">Redraw</Button>
+        <Button type="button" variant="ghost" @click="reset">Reset</Button>
+      </Space>
+    </Space>
+
+    <Callout :tone="calloutTone" :title="calloutTitle" :description="status" />
+
+    <canvas
+      class="canvas"
+      width="720"
+      height="440"
+      role="img"
+      aria-label="Strange attractor point cloud"
+    ></canvas>
+
+    <Typography variant="secondary">
+      {{ family }} · Points: {{ pointCount }} · Dim ≈ {{ dimText }}
+    </Typography>
+  </Space>
+</template>
+
+<style>
+.toolbar {
+  align-items: flex-end;
+  width: 100%;
+}
+.actions {
+  align-items: center;
+  padding-bottom: 0.15rem;
+}
+.canvas {
+  display: block;
+  width: min(100%, 36rem);
+  height: auto;
+  border: 1px solid var(--vmz-line-default);
+  border-radius: var(--vmz-radius-lg, 8px);
+  background: var(--vmz-surface-mist, #f5f5f5);
+}
+</style>
+
+<script client>
+type Point2 = { x: number; y: number };
+
+type PointCloud = {
+  points: Point2[];
+  count: number;
+};
+
+type WasmModule = {
+  default: (input?: RequestInfo | URL | Response | BufferSource | WebAssembly.Module) => Promise<unknown>;
+  sampleClifford: (
+    a: number,
+    b: number,
+    c: number,
+    d: number,
+    iterations: number,
+    burnIn: number,
+  ) => PointCloud;
+  sampleDejong: (
+    a: number,
+    b: number,
+    c: number,
+    d: number,
+    iterations: number,
+    burnIn: number,
+  ) => PointCloud;
+  boxCountingDimension: (points: Point2[], minBoxes: number) => number | null;
+};
+
+type FitBounds = { minX: number; minY: number; width: number; height: number };
+
+function fitBounds(points: Point2[], padding = 16): FitBounds {
+  if (points.length === 0) {
+    return { minX: 0, minY: 0, width: 100, height: 100 };
+  }
+  let minX = points[0].x;
+  let minY = points[0].y;
+  let maxX = points[0].x;
+  let maxY = points[0].y;
+  for (const p of points) {
+    if (p.x < minX) minX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y > maxY) maxY = p.y;
+  }
+  return {
+    minX: minX - padding,
+    minY: minY - padding,
+    width: Math.max(maxX - minX, 1) + padding * 2,
+    height: Math.max(maxY - minY, 1) + padding * 2,
+  };
+}
+
+function plotCanvas(
+  canvas: HTMLCanvasElement,
+  points: Point2[],
+  options: { padding?: number; fillStyle?: string; pointSize?: number; background?: string } = {},
+) {
+  const padding = options.padding ?? 8;
+  const pointSize = options.pointSize ?? 1;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("2D canvas context unavailable");
+  const width = canvas.width;
+  const height = canvas.height;
+  ctx.clearRect(0, 0, width, height);
+  if (options.background) {
+    ctx.fillStyle = options.background;
+    ctx.fillRect(0, 0, width, height);
+  }
+  if (points.length === 0) return;
+
+  const box = fitBounds(points, padding);
+  const scale = Math.min(width / box.width, height / box.height);
+  const ox = (width - box.width * scale) / 2;
+  const oy = (height - box.height * scale) / 2;
+
+  ctx.fillStyle =
+    options.fillStyle ??
+    (getComputedStyle(canvas).getPropertyValue("--vmz-status-runtime-accent").trim() || "#722ed1");
+  for (const p of points) {
+    const x = ox + (p.x - box.minX) * scale;
+    const y = oy + (p.y - box.minY) * scale;
+    ctx.fillRect(x, y, pointSize, pointSize);
+  }
+}
+
+let wasmReady: Promise<WasmModule> | null = null;
+
+function loadWasm(): Promise<WasmModule> {
+  if (!wasmReady) {
+    wasmReady = import("/wasm/fractal_wasm.js").then(async (mod: WasmModule) => {
+      await mod.default("/wasm/fractal_wasm_bg.wasm");
+      return mod;
+    });
+  }
+  return wasmReady;
+}
+
+export default class AttractorPanel {
+  family = "clifford";
+  samples = 60_000;
+  samplesText = "60000";
+  status = "Loading WASM dynamics engine…";
+  pointCount = 0;
+  dimText = "—";
+  busy = false;
+  calloutTone = "info";
+  calloutTitle = "Status";
+
+  constructor() {
+    void this.draw();
+  }
+
+  paint(points: Point2[]) {
+    const canvas = document.querySelector(".attractor canvas.canvas") as HTMLCanvasElement | null;
+    if (!canvas) return;
+    const mist = getComputedStyle(document.body).getPropertyValue("--vmz-surface-mist").trim() || "#f5f5f5";
+    const fill =
+      getComputedStyle(document.body).getPropertyValue("--vmz-status-runtime-accent").trim() || "#722ed1";
+    plotCanvas(canvas, points, { padding: 8, background: mist, fillStyle: fill, pointSize: 1 });
+  }
+
+  async draw() {
+    if (this.busy) return;
+    this.busy = true;
+    this.calloutTone = "info";
+    this.calloutTitle = "Sampling";
+    this.status = "WASM iterates the map; TypeScript plots the orbit…";
+    try {
+      const wasm = await loadWasm();
+      const result =
+        this.family === "dejong"
+          ? wasm.sampleDejong(-2, -2, -1.2, 2, this.samples, 20)
+          : wasm.sampleClifford(-1.4, 1.6, 1.0, 0.7, this.samples, 50);
+      this.pointCount = result.count;
+      const dim = wasm.boxCountingDimension(result.points, 2);
+      this.dimText = typeof dim === "number" ? dim.toFixed(3) : "—";
+      this.samplesText = String(this.samples);
+      this.paint(result.points);
+      this.calloutTone = "success";
+      this.calloutTitle = `${this.family} · ${this.samples} samples`;
+      this.status = "Geometry from Rust WASM · paint from TypeScript canvas.";
+    } catch (err) {
+      this.calloutTone = "danger";
+      this.calloutTitle = "Render failed";
+      this.status = err instanceof Error ? err.message : String(err);
+    } finally {
+      this.busy = false;
+    }
+  }
+
+  onFamilyInput(event: Event) {
+    const target = event.target as HTMLInputElement | null;
+    if (!target) return;
+    const next = target.value.trim().toLowerCase();
+    if (next !== "clifford" && next !== "dejong") return;
+    this.family = next;
+    void this.draw();
+  }
+
+  onSamplesInput(event: Event) {
+    const target = event.target as HTMLInputElement | null;
+    if (!target) return;
+    const next = Number.parseInt(target.value, 10);
+    if (!Number.isFinite(next) || next < 5_000 || next > 120_000) return;
+    this.samples = next;
+    this.samplesText = String(next);
+    void this.draw();
+  }
+
+  redraw() {
+    void this.draw();
+  }
+
+  reset() {
+    this.family = "clifford";
+    this.samples = 60_000;
+    this.samplesText = "60000";
+    void this.draw();
+  }
+}
+</script>

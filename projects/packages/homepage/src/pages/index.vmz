@@ -20,6 +20,12 @@
         <SierpinskiPanel />
       </Card>
       <Card
+        title="Strange attractors"
+        description="Clifford / de Jong maps from Rust WASM; TypeScript plots the orbit. Type `clifford` or `dejong` in Family."
+      >
+        <AttractorPanel />
+      </Card>
+      <Card
         title="Escape time (Mandelbrot / Julia)"
         description="Iteration fields from Rust WASM; TypeScript maps values to ImageData. Type `mandelbrot` or `julia` in Family."
       >
