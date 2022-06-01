@@ -87,6 +87,15 @@ console.log(melody.count, melody.events[0]);
 ```
 
 ```js
+import { growMelody, toMidiBytes } from "@doki-land/fractal";
+
+const melody = growMelody(3, 120, 60);
+const mid = toMidiBytes(melody, { tempoBpm: 120 });
+// save `mid` as a .mid file in the host
+console.log(mid.byteLength);
+```
+
+```js
 import { boxCountingDimension, growFern } from "@doki-land/fractal";
 
 const fern = growFern(20_000, 1);

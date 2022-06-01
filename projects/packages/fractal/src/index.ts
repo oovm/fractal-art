@@ -24,7 +24,9 @@ export {
 } from "./render.ts";
 export {
     playMelody,
+    toMidiBytes,
     type MelodyLike,
+    type MidiExportOptions,
     type NoteEventLike,
     type PlayMelodyOptions,
 } from "./audio.ts";

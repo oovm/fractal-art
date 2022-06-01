@@ -17,9 +17,10 @@
     "files": ["src"],
     "scripts": {
         "typecheck": "tsc --noEmit",
-        "test": "node --test --experimental-strip-types tests/render.test.ts tests/native.test.ts",
+        "test": "node --test --experimental-strip-types tests/render.test.ts tests/native.test.ts tests/audio.test.ts",
         "test:render": "node --test --experimental-strip-types tests/render.test.ts",
-        "test:native": "node --test --experimental-strip-types tests/native.test.ts"
+        "test:native": "node --test --experimental-strip-types tests/native.test.ts",
+        "test:audio": "node --test --experimental-strip-types tests/audio.test.ts"
     },
     "optionalDependencies": {
         "@doki-land/fractal-darwin-arm64": "workspace:*",
