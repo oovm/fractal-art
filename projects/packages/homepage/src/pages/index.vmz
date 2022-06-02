@@ -33,7 +33,7 @@
       </Card>
       <Card
         title="L-system melody"
-        description="Note events from Rust WASM; TypeScript schedules Web Audio oscillators (no PCM bake-in)."
+        description="Note events from Rust WASM; TypeScript plays Web Audio or exports SMF (Download MIDI)."
       >
         <MelodyPanel />
       </Card>
