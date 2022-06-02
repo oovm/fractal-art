@@ -1,7 +1,7 @@
 use fractal::{
-    Point, RewriteRule, barnsley_fern, box_counting_dimension, clifford_classic, grow_fern,
-    grow_melody, grow_sierpinski, julia, mandelbrot, points_to_polyline, rewrite, sample_clifford,
-    sample_dejong, sample_ifs, turtle_path,
+    LorenzPlane, Point, RewriteRule, barnsley_fern, box_counting_dimension, clifford_classic,
+    grow_fern, grow_melody, grow_sierpinski, julia, lorenz_classic, mandelbrot, points_to_polyline,
+    rewrite, sample_clifford, sample_dejong, sample_ifs, sample_lorenz, turtle_path,
 };
 
 #[test]
@@ -126,4 +126,19 @@ fn dejong_attractor_is_deterministic_and_nonempty() {
     let pts = sample_dejong(-2.0, -2.0, -1.2, 2.0, 2_000, 20);
     assert_eq!(pts.len(), 2_000);
     assert!(pts.iter().any(|p| p.x != pts[0].x || p.y != pts[0].y));
+}
+
+#[test]
+fn lorenz_xy_projection_is_deterministic_and_bounded() {
+    let (sigma, rho, beta) = lorenz_classic();
+    let a = sample_lorenz(sigma, rho, beta, 0.01, 5_000, 200, LorenzPlane::Xy);
+    let b = sample_lorenz(sigma, rho, beta, 0.01, 5_000, 200, LorenzPlane::Xy);
+    assert_eq!(a, b);
+    assert_eq!(a.len(), 5_000);
+    for p in &a {
+        assert!(p.x.is_finite() && p.y.is_finite());
+        assert!(p.x.abs() < 40.0 && p.y.abs() < 40.0, "({} {})", p.x, p.y);
+    }
+    // Lorenz butterfly is not a single fixed point.
+    assert!(a.iter().any(|p| (p.x - a[0].x).abs() > 1.0));
 }
