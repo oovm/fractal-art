@@ -4,7 +4,7 @@
       <Field
         label="Family"
         :value="family"
-        description="Type `clifford` or `dejong`. WASM iterates the map; TypeScript plots."
+        description="Type `clifford`, `dejong`, or `lorenz`. WASM iterates; TypeScript plots."
         @input="onFamilyInput"
       />
       <Field
@@ -82,6 +82,15 @@ type WasmModule = {
     d: number,
     iterations: number,
     burnIn: number,
+  ) => PointCloud;
+  sampleLorenz: (
+    sigma: number,
+    rho: number,
+    beta: number,
+    dt: number,
+    iterations: number,
+    burnIn: number,
+    plane: string,
   ) => PointCloud;
   boxCountingDimension: (points: Point2[], minBoxes: number) => number | null;
 };
@@ -190,7 +199,9 @@ export default class AttractorPanel {
       const result =
         this.family === "dejong"
           ? wasm.sampleDejong(-2, -2, -1.2, 2, this.samples, 20)
-          : wasm.sampleClifford(-1.4, 1.6, 1.0, 0.7, this.samples, 50);
+          : this.family === "lorenz"
+            ? wasm.sampleLorenz(10, 28, 8 / 3, 0.01, this.samples, 200, "xy")
+            : wasm.sampleClifford(-1.4, 1.6, 1.0, 0.7, this.samples, 50);
       this.pointCount = result.count;
       const dim = wasm.boxCountingDimension(result.points, 2);
       this.dimText = typeof dim === "number" ? dim.toFixed(3) : "—";

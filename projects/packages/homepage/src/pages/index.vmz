@@ -21,7 +21,7 @@
       </Card>
       <Card
         title="Strange attractors"
-        description="Clifford / de Jong maps from Rust WASM; TypeScript plots the orbit. Type `clifford` or `dejong` in Family."
+        description="Clifford / de Jong / Lorenz from Rust WASM; TypeScript plots. Type `clifford`, `dejong`, or `lorenz`."
       >
         <AttractorPanel />
       </Card>
