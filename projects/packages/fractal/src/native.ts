@@ -133,6 +133,7 @@ type FractalBinding = {
         count: number;
     };
     boxCountingDimension: (points: Point2[], minBoxes: number) => number | null;
+    correlationDimension: (points: Point2[], maxPoints: number) => number | null;
 };
 
 /** Platform package map — same shape as `@doki-land/nifty-<platform>`. */

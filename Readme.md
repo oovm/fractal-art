@@ -103,10 +103,10 @@ console.log(mid.byteLength);
 ```
 
 ```js
-import { boxCountingDimension, growFern } from "@doki-land/fractal";
+import { boxCountingDimension, correlationDimension, growFern } from "@doki-land/fractal";
 
 const fern = growFern(20_000, 1);
-console.log(boxCountingDimension(fern.points));
+console.log(boxCountingDimension(fern.points), correlationDimension(fern.points));
 ```
 
 ## Web (homepage)

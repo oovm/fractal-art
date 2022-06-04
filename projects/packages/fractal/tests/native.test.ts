@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
     boxCountingDimension,
+    correlationDimension,
     growFern,
     growMelody,
     growPlant,
@@ -153,6 +154,15 @@ describe("boxCountingDimension", () => {
     it("estimates fern dimension between 1 and 2", () => {
         const fern = growFern(5_000, 42);
         const dim = boxCountingDimension(fern.points, 2);
+        assert.equal(typeof dim, "number");
+        assert.ok(dim! > 1 && dim! < 2, `dim=${dim}`);
+    });
+});
+
+describe("correlationDimension", () => {
+    it("estimates fern correlation dimension between 1 and 2", () => {
+        const fern = growFern(5_000, 42);
+        const dim = correlationDimension(fern.points, 350);
         assert.equal(typeof dim, "number");
         assert.ok(dim! > 1 && dim! < 2, `dim=${dim}`);
     });

@@ -145,3 +145,11 @@ export function boxCountingDimension(
 ): number | null {
     return loadFractalNative().boxCountingDimension(points, minBoxes);
 }
+
+/** Correlation dimension for a 2D point cloud (`null` if degenerate). */
+export function correlationDimension(
+    points: { x: number; y: number }[],
+    maxPoints = 400,
+): number | null {
+    return loadFractalNative().correlationDimension(points, maxPoints);
+}
