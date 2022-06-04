@@ -88,6 +88,18 @@ type FractalBinding = {
         points: Point2[];
         count: number;
     };
+    sampleLorenz: (
+        sigma: number,
+        rho: number,
+        beta: number,
+        dt: number,
+        iterations: number,
+        burnIn: number,
+        plane: string,
+    ) => {
+        points: Point2[];
+        count: number;
+    };
     mandelbrot: (
         width: number,
         height: number,

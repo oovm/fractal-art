@@ -71,6 +71,13 @@ console.log(clifford.count, dejong.count);
 ```
 
 ```js
+import { sampleLorenz } from "@doki-land/fractal";
+
+const lorenz = sampleLorenz(10, 28, 8 / 3, 0.01, 50_000, 200, "xy");
+console.log(lorenz.count);
+```
+
+```js
 import { mandelbrot, paintEscapeField } from "@doki-land/fractal";
 
 const field = mandelbrot(640, 400, -0.5, 0, 3, 120);

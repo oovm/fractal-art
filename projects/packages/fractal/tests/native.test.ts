@@ -12,6 +12,7 @@ import {
     sampleClifford,
     sampleDejong,
     sampleIfs,
+    sampleLorenz,
     toSvgPolyline,
 } from "../src/index.ts";
 
@@ -95,6 +96,21 @@ describe("sampleClifford / sampleDejong", () => {
         const cloud = sampleDejong(-2, -2, -1.2, 2, 2_000, 20);
         assert.equal(cloud.count, 2_000);
         assert.ok(cloud.points.some((p) => p.x !== cloud.points[0].x || p.y !== cloud.points[0].y));
+    });
+});
+
+describe("sampleLorenz", () => {
+    it("samples a deterministic xy projection", () => {
+        const a = sampleLorenz(10, 28, 8 / 3, 0.01, 4_000, 200, "xy");
+        const b = sampleLorenz(10, 28, 8 / 3, 0.01, 4_000, 200, "xy");
+        assert.equal(a.count, 4_000);
+        assert.equal(a.points[0].x, b.points[0].x);
+        assert.equal(a.points[0].y, b.points[0].y);
+        assert.ok(a.points.some((p) => Math.abs(p.x - a.points[0].x) > 1));
+        for (const p of a.points) {
+            assert.ok(Number.isFinite(p.x) && Number.isFinite(p.y));
+            assert.ok(Math.abs(p.x) < 40 && Math.abs(p.y) < 40);
+        }
     });
 });
 

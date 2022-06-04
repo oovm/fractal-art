@@ -94,6 +94,19 @@ export function sampleDejong(
     return loadFractalNative().sampleDejong(a, b, c, d, iterations, burnIn);
 }
 
+/** Sample a Lorenz attractor projected to `xy` / `xz` / `yz`. */
+export function sampleLorenz(
+    sigma = 10,
+    rho = 28,
+    beta = 8 / 3,
+    dt = 0.01,
+    iterations = 50_000,
+    burnIn = 200,
+    plane: "xy" | "xz" | "yz" = "xy",
+): PointCloud {
+    return loadFractalNative().sampleLorenz(sigma, rho, beta, dt, iterations, burnIn, plane);
+}
+
 /** Sample a Mandelbrot escape-time field (paint with `paintEscapeField`). */
 export function mandelbrot(
     width = 640,
