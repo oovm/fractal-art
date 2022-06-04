@@ -4,9 +4,9 @@
 
 use fractal::{
     Affine2, LorenzPlane, Point, RewriteRule, box_counting_dimension as box_counting_dimension_core,
-    grow_fern as grow_fern_core, grow_melody as grow_melody_core,
-    grow_sierpinski as grow_sierpinski_core, julia as julia_core, mandelbrot as mandelbrot_core,
-    rewrite as rewrite_core, sample_clifford as sample_clifford_core,
+    correlation_dimension as correlation_dimension_core, grow_fern as grow_fern_core,
+    grow_melody as grow_melody_core, grow_sierpinski as grow_sierpinski_core, julia as julia_core,
+    mandelbrot as mandelbrot_core, rewrite as rewrite_core, sample_clifford as sample_clifford_core,
     sample_dejong as sample_dejong_core, sample_ifs as sample_ifs_core,
     sample_lorenz as sample_lorenz_core, turtle_path,
 };
@@ -300,4 +300,11 @@ pub fn grow_melody(iterations: u32, tempo_bpm: f64, seed_midi: u32) -> Melody {
 pub fn box_counting_dimension(points: Vec<Point2>, min_boxes: u32) -> Option<f64> {
     let mapped: Vec<Point> = points.iter().map(|p| Point { x: p.x, y: p.y }).collect();
     box_counting_dimension_core(&mapped, min_boxes.max(2))
+}
+
+/// Correlation dimension for a 2D point cloud (`null` if degenerate).
+#[napi]
+pub fn correlation_dimension(points: Vec<Point2>, max_points: u32) -> Option<f64> {
+    let mapped: Vec<Point> = points.iter().map(|p| Point { x: p.x, y: p.y }).collect();
+    correlation_dimension_core(&mapped, max_points.max(32))
 }

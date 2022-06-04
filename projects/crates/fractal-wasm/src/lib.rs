@@ -4,10 +4,11 @@
 
 use fractal::{
     Affine2, LorenzPlane, Point, RewriteRule, box_counting_dimension as box_counting_dimension_core,
-    grow_fern as grow_fern_core, grow_melody as grow_melody_core,
-    grow_sierpinski as grow_sierpinski_core, julia as julia_core, mandelbrot as mandelbrot_core,
-    rewrite, sample_clifford as sample_clifford_core, sample_dejong as sample_dejong_core,
-    sample_ifs as sample_ifs_core, sample_lorenz as sample_lorenz_core, turtle_path,
+    correlation_dimension as correlation_dimension_core, grow_fern as grow_fern_core,
+    grow_melody as grow_melody_core, grow_sierpinski as grow_sierpinski_core, julia as julia_core,
+    mandelbrot as mandelbrot_core, rewrite, sample_clifford as sample_clifford_core,
+    sample_dejong as sample_dejong_core, sample_ifs as sample_ifs_core,
+    sample_lorenz as sample_lorenz_core, turtle_path,
 };
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -318,6 +319,17 @@ pub fn box_counting_dimension(points: JsValue, min_boxes: u32) -> Result<JsValue
     let raw: Vec<PointJs> = serde_wasm_bindgen::from_value(points).map_err(js_err)?;
     let mapped: Vec<Point> = raw.iter().map(|p| Point { x: p.x, y: p.y }).collect();
     match box_counting_dimension_core(&mapped, min_boxes.max(2)) {
+        Some(dim) => Ok(JsValue::from_f64(dim)),
+        None => Ok(JsValue::NULL),
+    }
+}
+
+/// Correlation dimension for a 2D point cloud (`null` if degenerate).
+#[wasm_bindgen(js_name = correlationDimension)]
+pub fn correlation_dimension(points: JsValue, max_points: u32) -> Result<JsValue, JsValue> {
+    let raw: Vec<PointJs> = serde_wasm_bindgen::from_value(points).map_err(js_err)?;
+    let mapped: Vec<Point> = raw.iter().map(|p| Point { x: p.x, y: p.y }).collect();
+    match correlation_dimension_core(&mapped, max_points.max(32)) {
         Some(dim) => Ok(JsValue::from_f64(dim)),
         None => Ok(JsValue::NULL),
     }
