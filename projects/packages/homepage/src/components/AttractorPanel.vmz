@@ -223,7 +223,7 @@ export default class AttractorPanel {
     const target = event.target as HTMLInputElement | null;
     if (!target) return;
     const next = target.value.trim().toLowerCase();
-    if (next !== "clifford" && next !== "dejong") return;
+    if (next !== "clifford" && next !== "dejong" && next !== "lorenz") return;
     this.family = next;
     void this.draw();
   }
