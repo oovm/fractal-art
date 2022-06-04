@@ -3,11 +3,12 @@
 //! SVG/Canvas/WebAudio stays in TypeScript.
 
 use fractal::{
-    Affine2, Point, RewriteRule, box_counting_dimension as box_counting_dimension_core,
+    Affine2, LorenzPlane, Point, RewriteRule, box_counting_dimension as box_counting_dimension_core,
     grow_fern as grow_fern_core, grow_melody as grow_melody_core,
     grow_sierpinski as grow_sierpinski_core, julia as julia_core, mandelbrot as mandelbrot_core,
     rewrite as rewrite_core, sample_clifford as sample_clifford_core,
-    sample_dejong as sample_dejong_core, sample_ifs as sample_ifs_core, turtle_path,
+    sample_dejong as sample_dejong_core, sample_ifs as sample_ifs_core,
+    sample_lorenz as sample_lorenz_core, turtle_path,
 };
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
@@ -178,6 +179,42 @@ pub fn sample_dejong(
         count: path.len() as u32,
         points: path.iter().map(|p| Point2 { x: p.x, y: p.y }).collect(),
     }
+}
+
+fn parse_lorenz_plane(plane: &str) -> Result<LorenzPlane> {
+    match plane.trim().to_ascii_lowercase().as_str() {
+        "xy" => Ok(LorenzPlane::Xy),
+        "xz" => Ok(LorenzPlane::Xz),
+        "yz" => Ok(LorenzPlane::Yz),
+        _ => Err(Error::from_reason("plane must be one of xy, xz, yz")),
+    }
+}
+
+/// Sample a Lorenz attractor projected to a 2D plane (`xy` / `xz` / `yz`).
+#[napi]
+pub fn sample_lorenz(
+    sigma: f64,
+    rho: f64,
+    beta: f64,
+    dt: f64,
+    iterations: u32,
+    burn_in: u32,
+    plane: String,
+) -> Result<PointCloud> {
+    let plane = parse_lorenz_plane(&plane)?;
+    let path = sample_lorenz_core(
+        sigma,
+        rho,
+        beta,
+        dt,
+        iterations as usize,
+        burn_in as usize,
+        plane,
+    );
+    Ok(PointCloud {
+        count: path.len() as u32,
+        points: path.iter().map(|p| Point2 { x: p.x, y: p.y }).collect(),
+    })
 }
 
 /// Sample a Mandelbrot escape-time field (row-major `values`, no color bake-in).
