@@ -1,7 +1,8 @@
 use fractal::{
     LorenzPlane, Point, RewriteRule, barnsley_fern, box_counting_dimension, clifford_classic,
-    grow_fern, grow_melody, grow_sierpinski, julia, lorenz_classic, mandelbrot, points_to_polyline,
-    rewrite, sample_clifford, sample_dejong, sample_ifs, sample_lorenz, turtle_path,
+    correlation_dimension, grow_fern, grow_melody, grow_sierpinski, julia, lorenz_classic,
+    mandelbrot, points_to_polyline, rewrite, sample_clifford, sample_dejong, sample_ifs,
+    sample_lorenz, turtle_path,
 };
 
 #[test]
@@ -85,6 +86,20 @@ fn box_counting_rejects_degenerate_clouds() {
     assert!(box_counting_dimension(&[], 2).is_none());
     assert!(box_counting_dimension(&[Point { x: 1.0, y: 1.0 }], 2).is_none());
     assert!(box_counting_dimension(&[Point { x: 0.0, y: 0.0 }, Point { x: 0.0, y: 0.0 }], 2).is_none());
+}
+
+#[test]
+fn correlation_dimension_fern_is_between_one_and_two() {
+    let pts = grow_fern(6_000, 7);
+    let dim = correlation_dimension(&pts, 400).expect("correlation dimension");
+    assert!(dim > 1.0 && dim < 2.0, "dim={dim}");
+}
+
+#[test]
+fn correlation_dimension_rejects_tiny_clouds() {
+    assert!(correlation_dimension(&[], 100).is_none());
+    let tiny = vec![Point { x: 0.0, y: 0.0 }; 10];
+    assert!(correlation_dimension(&tiny, 100).is_none());
 }
 
 #[test]
