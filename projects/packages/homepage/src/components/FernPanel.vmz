@@ -37,7 +37,7 @@
     ></canvas>
 
     <Typography variant="secondary">
-      Points: {{ pointCount }} · Seed: {{ seed }} · Dim ≈ {{ dimText }}
+      Points: {{ pointCount }} · Seed: {{ seed }} · Box ≈ {{ dimText }} · Corr ≈ {{ corrText }}
     </Typography>
   </Space>
 </template>
@@ -73,6 +73,7 @@ type WasmModule = {
   default: (input?: RequestInfo | URL | Response | BufferSource | WebAssembly.Module) => Promise<unknown>;
   growFern: (iterations: number, seed: number) => PointCloud;
   boxCountingDimension: (points: Point2[], minBoxes: number) => number | null;
+  correlationDimension: (points: Point2[], maxPoints: number) => number | null;
 };
 
 type FitBounds = { minX: number; minY: number; width: number; height: number };
@@ -154,6 +155,7 @@ export default class FernPanel {
   status = "Loading WASM IFS engine…";
   pointCount = 0;
   dimText = "—";
+  corrText = "—";
   busy = false;
   calloutTone = "info";
   calloutTitle = "Status";
@@ -182,12 +184,14 @@ export default class FernPanel {
       this.pointCount = result.count;
       const dim = wasm.boxCountingDimension(result.points, 2);
       this.dimText = typeof dim === "number" ? dim.toFixed(3) : "—";
+      const corr = wasm.correlationDimension(result.points, 350);
+      this.corrText = typeof corr === "number" ? corr.toFixed(3) : "—";
       this.samplesText = String(this.samples);
       this.seedText = String(this.seed);
       this.paint(result.points);
       this.calloutTone = "success";
       this.calloutTitle = `Barnsley · ${this.samples} samples`;
-      this.status = "Geometry + box-counting from Rust WASM · paint from TypeScript canvas.";
+      this.status = "Geometry + box/correlation dims from Rust WASM · paint from TypeScript canvas.";
     } catch (err) {
       this.calloutTone = "danger";
       this.calloutTitle = "Render failed";

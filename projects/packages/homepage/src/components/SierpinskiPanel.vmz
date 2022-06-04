@@ -36,7 +36,7 @@
     ></canvas>
 
     <Typography variant="secondary">
-      Points: {{ pointCount }} · Seed: {{ seed }} · Dim ≈ {{ dimText }}
+      Points: {{ pointCount }} · Seed: {{ seed }} · Box ≈ {{ dimText }} · Corr ≈ {{ corrText }}
     </Typography>
   </Space>
 </template>
@@ -83,6 +83,7 @@ type WasmModule = {
   growSierpinski: (iterations: number, seed: number) => PointCloud;
   sampleIfs: (maps: Affine2[], iterations: number, seed: number, burnIn: number) => PointCloud;
   boxCountingDimension: (points: Point2[], minBoxes: number) => number | null;
+  correlationDimension: (points: Point2[], maxPoints: number) => number | null;
 };
 
 type FitBounds = { minX: number; minY: number; width: number; height: number };
@@ -163,6 +164,7 @@ export default class SierpinskiPanel {
   status = "Loading WASM IFS engine…";
   pointCount = 0;
   dimText = "—";
+  corrText = "—";
   busy = false;
   calloutTone = "info";
   calloutTitle = "Status";
@@ -191,12 +193,14 @@ export default class SierpinskiPanel {
       this.pointCount = result.count;
       const dim = wasm.boxCountingDimension(result.points, 2);
       this.dimText = typeof dim === "number" ? dim.toFixed(3) : "—";
+      const corr = wasm.correlationDimension(result.points, 350);
+      this.corrText = typeof corr === "number" ? corr.toFixed(3) : "—";
       this.samplesText = String(this.samples);
       this.seedText = String(this.seed);
       this.paint(result.points);
       this.calloutTone = "success";
       this.calloutTitle = `Sierpiński · ${this.samples} samples`;
-      this.status = "Preset via growSierpinski · same engine as sampleIfs · paint from TypeScript.";
+      this.status = "Preset via growSierpinski · box/correlation dims from WASM · paint from TypeScript.";
     } catch (err) {
       this.calloutTone = "danger";
       this.calloutTitle = "Render failed";
