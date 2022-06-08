@@ -7,7 +7,10 @@ mod ifs;
 mod rewrite;
 mod turtle;
 
-pub use analysis::{box_counting_dimension, correlation_dimension};
+pub use analysis::{
+    LyapunovScan, box_counting_dimension, correlation_dimension, logistic_lyapunov,
+    logistic_lyapunov_scan,
+};
 pub use audio::{NoteEvent, grow_melody};
 pub use dynamics::{
     LorenzPlane, clifford_classic, dejong_classic, lorenz_classic, sample_clifford, sample_dejong,

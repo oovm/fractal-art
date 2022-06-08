@@ -1,8 +1,8 @@
 use fractal::{
     LorenzPlane, Point, RewriteRule, barnsley_fern, box_counting_dimension, clifford_classic,
-    correlation_dimension, grow_fern, grow_melody, grow_sierpinski, julia, lorenz_classic,
-    mandelbrot, points_to_polyline, rewrite, sample_clifford, sample_dejong, sample_ifs,
-    sample_lorenz, turtle_path,
+    correlation_dimension, grow_fern, grow_melody, grow_sierpinski, julia, logistic_lyapunov,
+    logistic_lyapunov_scan, lorenz_classic, mandelbrot, points_to_polyline, rewrite, sample_clifford,
+    sample_dejong, sample_ifs, sample_lorenz, turtle_path,
 };
 
 #[test]
@@ -100,6 +100,27 @@ fn correlation_dimension_rejects_tiny_clouds() {
     assert!(correlation_dimension(&[], 100).is_none());
     let tiny = vec![Point { x: 0.0, y: 0.0 }; 10];
     assert!(correlation_dimension(&tiny, 100).is_none());
+}
+
+#[test]
+fn logistic_lyapunov_stable_at_r_two() {
+    let lam = logistic_lyapunov(2.0, 2_000, 200).expect("lambda");
+    assert!(lam < -0.5, "lam={lam}");
+}
+
+#[test]
+fn logistic_lyapunov_chaotic_near_r_four() {
+    let lam = logistic_lyapunov(3.9, 4_000, 400).expect("lambda");
+    assert!(lam > 0.0, "lam={lam}");
+}
+
+#[test]
+fn logistic_lyapunov_scan_covers_range() {
+    let scan = logistic_lyapunov_scan(2.5, 4.0, 64, 1_500, 150).expect("scan");
+    assert_eq!(scan.steps, 64);
+    assert_eq!(scan.values.len(), 64);
+    assert!(scan.values.iter().any(|&v| v < 0.0));
+    assert!(scan.values.iter().any(|&v| v > 0.0));
 }
 
 #[test]

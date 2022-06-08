@@ -162,3 +162,60 @@ fn slope_log_log(xs: &[f64], ys: &[f64]) -> Option<f64> {
     }
     Some((n * sum_xy - sum_x * sum_y) / denom)
 }
+
+/// Lyapunov exponent of the logistic map `x → r·x·(1 − x)` at parameter `r`.
+///
+/// Positive ≈ chaos, negative ≈ stable attractor. `None` if `r` is non-finite.
+pub fn logistic_lyapunov(r: f64, iterations: usize, burn_in: usize) -> Option<f64> {
+    if !r.is_finite() {
+        return None;
+    }
+    let iterations = iterations.max(1);
+    let mut x = 0.5_f64;
+    for _ in 0..burn_in {
+        x = r * x * (1.0 - x);
+    }
+    let mut acc = 0.0_f64;
+    for _ in 0..iterations {
+        let deriv = (r * (1.0 - 2.0 * x)).abs().max(1e-15);
+        acc += deriv.ln();
+        x = r * x * (1.0 - x);
+    }
+    Some(acc / iterations as f64)
+}
+
+/// Scan logistic Lyapunov exponents over `[r_min, r_max]` (inclusive endpoints).
+pub fn logistic_lyapunov_scan(
+    r_min: f64,
+    r_max: f64,
+    steps: u32,
+    iterations: usize,
+    burn_in: usize,
+) -> Option<LyapunovScan> {
+    let steps = steps.max(2);
+    if !(r_max > r_min) || !r_min.is_finite() || !r_max.is_finite() {
+        return None;
+    }
+    let mut values = Vec::with_capacity(steps as usize);
+    for i in 0..steps {
+        let t = i as f64 / (steps as f64 - 1.0);
+        let r = r_min + (r_max - r_min) * t;
+        values.push(logistic_lyapunov(r, iterations, burn_in)?);
+    }
+    Some(LyapunovScan {
+        r_min,
+        r_max,
+        steps,
+        values,
+    })
+}
+
+/// Result of [`logistic_lyapunov_scan`]: `values[i]` is λ at
+/// `r = r_min + (r_max − r_min) · i / (steps − 1)`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct LyapunovScan {
+    pub r_min: f64,
+    pub r_max: f64,
+    pub steps: u32,
+    pub values: Vec<f64>,
+}
