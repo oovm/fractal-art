@@ -6,7 +6,9 @@ use fractal::{
     Affine2, LorenzPlane, Point, RewriteRule, box_counting_dimension as box_counting_dimension_core,
     correlation_dimension as correlation_dimension_core, grow_fern as grow_fern_core,
     grow_melody as grow_melody_core, grow_sierpinski as grow_sierpinski_core, julia as julia_core,
-    mandelbrot as mandelbrot_core, rewrite as rewrite_core, sample_clifford as sample_clifford_core,
+    logistic_lyapunov as logistic_lyapunov_core,
+    logistic_lyapunov_scan as logistic_lyapunov_scan_core, mandelbrot as mandelbrot_core,
+    rewrite as rewrite_core, sample_clifford as sample_clifford_core,
     sample_dejong as sample_dejong_core, sample_ifs as sample_ifs_core,
     sample_lorenz as sample_lorenz_core, turtle_path,
 };
@@ -66,6 +68,14 @@ pub struct NoteEvent {
 pub struct Melody {
     pub events: Vec<NoteEvent>,
     pub count: u32,
+}
+
+#[napi(object)]
+pub struct LyapunovScan {
+    pub r_min: f64,
+    pub r_max: f64,
+    pub steps: u32,
+    pub values: Vec<f64>,
 }
 
 fn clamp_side(side: u32) -> u32 {
@@ -307,4 +317,34 @@ pub fn box_counting_dimension(points: Vec<Point2>, min_boxes: u32) -> Option<f64
 pub fn correlation_dimension(points: Vec<Point2>, max_points: u32) -> Option<f64> {
     let mapped: Vec<Point> = points.iter().map(|p| Point { x: p.x, y: p.y }).collect();
     correlation_dimension_core(&mapped, max_points.max(32))
+}
+
+/// Lyapunov exponent of the logistic map at parameter `r` (`null` if non-finite).
+#[napi]
+pub fn logistic_lyapunov(r: f64, iterations: u32, burn_in: u32) -> Option<f64> {
+    logistic_lyapunov_core(r, iterations.max(1) as usize, burn_in as usize)
+}
+
+/// Scan logistic Lyapunov exponents over `[rMin, rMax]`.
+#[napi]
+pub fn logistic_lyapunov_scan(
+    r_min: f64,
+    r_max: f64,
+    steps: u32,
+    iterations: u32,
+    burn_in: u32,
+) -> Option<LyapunovScan> {
+    let scan = logistic_lyapunov_scan_core(
+        r_min,
+        r_max,
+        steps.max(2),
+        iterations.max(1) as usize,
+        burn_in as usize,
+    )?;
+    Some(LyapunovScan {
+        r_min: scan.r_min,
+        r_max: scan.r_max,
+        steps: scan.steps,
+        values: scan.values,
+    })
 }
