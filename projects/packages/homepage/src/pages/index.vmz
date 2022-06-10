@@ -32,6 +32,12 @@
         <EscapePanel />
       </Card>
       <Card
+        title="Logistic Lyapunov"
+        description="Classic chaos diagram: WASM scans λ(r) for x→r·x·(1−x); TypeScript plots the curve (λ>0 ≈ chaos)."
+      >
+        <LyapunovPanel />
+      </Card>
+      <Card
         title="L-system melody"
         description="Note events from Rust WASM; TypeScript plays Web Audio or exports SMF (Download MIDI)."
       >

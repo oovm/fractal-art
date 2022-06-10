@@ -1,0 +1,248 @@
+<template>
+  <Space direction="vertical" size="large" class="lyapunov">
+    <Space wrap size="middle" class="toolbar">
+      <Field
+        label="Steps"
+        type="number"
+        min="64"
+        max="1024"
+        step="64"
+        :value="stepsText"
+        description="WASM scans λ(r) for the logistic map; TypeScript plots the curve."
+        @input="onStepsInput"
+      />
+      <Field
+        label="r min"
+        type="number"
+        min="0.5"
+        max="3.9"
+        step="0.1"
+        :value="rMinText"
+        @input="onRMinInput"
+      />
+      <Field
+        label="r max"
+        type="number"
+        min="2.6"
+        max="4"
+        step="0.1"
+        :value="rMaxText"
+        @input="onRMaxInput"
+      />
+      <Space wrap size="small" class="actions">
+        <Button type="button" @click="redraw">Redraw</Button>
+        <Button type="button" variant="ghost" @click="reset">Reset</Button>
+      </Space>
+    </Space>
+
+    <Callout :tone="calloutTone" :title="calloutTitle" :description="status" />
+
+    <canvas
+      class="canvas"
+      width="720"
+      height="320"
+      role="img"
+      aria-label="Logistic map Lyapunov exponent scan"
+    ></canvas>
+
+    <Typography variant="secondary">
+      Steps: {{ steps }} · r ∈ [{{ rMin }}, {{ rMax }}] · λ@3.9 ≈ {{ lamText }}
+    </Typography>
+  </Space>
+</template>
+
+<style>
+.toolbar {
+  align-items: flex-end;
+  width: 100%;
+}
+.actions {
+  align-items: center;
+  padding-bottom: 0.15rem;
+}
+.canvas {
+  display: block;
+  width: min(100%, 36rem);
+  height: auto;
+  border: 1px solid var(--vmz-line-default);
+  border-radius: var(--vmz-radius-lg, 8px);
+  background: var(--vmz-surface-mist, #f5f5f5);
+}
+</style>
+
+<script client>
+type LyapunovScan = {
+  rMin: number;
+  rMax: number;
+  steps: number;
+  values: number[] | Float64Array;
+};
+
+type WasmModule = {
+  default: (input?: RequestInfo | URL | Response | BufferSource | WebAssembly.Module) => Promise<unknown>;
+  logisticLyapunov: (r: number, iterations: number, burnIn: number) => number | null;
+  logisticLyapunovScan: (
+    rMin: number,
+    rMax: number,
+    steps: number,
+    iterations: number,
+    burnIn: number,
+  ) => LyapunovScan | null;
+};
+
+/** TS render: plot λ(r) polyline (positive above zero line = chaos). */
+function paintLyapunovScan(canvas: HTMLCanvasElement, scan: LyapunovScan) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("2D canvas context unavailable");
+  const width = canvas.width;
+  const height = canvas.height;
+  const mist = getComputedStyle(document.body).getPropertyValue("--vmz-surface-mist").trim() || "#f5f5f5";
+  const ink = getComputedStyle(document.body).getPropertyValue("--vmz-text-primary").trim() || "#1f1f1f";
+  const accent =
+    getComputedStyle(document.body).getPropertyValue("--vmz-status-danger-accent").trim() || "#cf1322";
+  const zero =
+    getComputedStyle(document.body).getPropertyValue("--vmz-line-default").trim() || "#d9d9d9";
+
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = mist;
+  ctx.fillRect(0, 0, width, height);
+
+  const values = [...scan.values];
+  if (values.length < 2) return;
+  let minV = values[0];
+  let maxV = values[0];
+  for (const v of values) {
+    if (v < minV) minV = v;
+    if (v > maxV) maxV = v;
+  }
+  const pad = 16;
+  const span = Math.max(maxV - minV, 1e-6);
+  const yOf = (v: number) => pad + ((maxV - v) / span) * (height - pad * 2);
+  const xOf = (i: number) => pad + (i / (values.length - 1)) * (width - pad * 2);
+
+  const y0 = yOf(0);
+  ctx.strokeStyle = zero;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad, y0);
+  ctx.lineTo(width - pad, y0);
+  ctx.stroke();
+
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let i = 0; i < values.length; i++) {
+    const x = xOf(i);
+    const y = yOf(values[i]);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  ctx.fillStyle = ink;
+  ctx.font = "12px sans-serif";
+  ctx.fillText(`λ`, 4, 14);
+  ctx.fillText(`${scan.rMin}`, pad, height - 4);
+  ctx.fillText(`${scan.rMax}`, width - pad - 24, height - 4);
+}
+
+let wasmReady: Promise<WasmModule> | null = null;
+
+function loadWasm(): Promise<WasmModule> {
+  if (!wasmReady) {
+    wasmReady = import("/wasm/fractal_wasm.js").then(async (mod: WasmModule) => {
+      await mod.default("/wasm/fractal_wasm_bg.wasm");
+      return mod;
+    });
+  }
+  return wasmReady;
+}
+
+export default class LyapunovPanel {
+  steps = 320;
+  stepsText = "320";
+  rMin = 2.5;
+  rMinText = "2.5";
+  rMax = 4.0;
+  rMaxText = "4";
+  lamText = "—";
+  status = "Loading WASM Lyapunov engine…";
+  busy = false;
+  calloutTone = "info";
+  calloutTitle = "Status";
+
+  constructor() {
+    void this.draw();
+  }
+
+  async draw() {
+    if (this.busy) return;
+    this.busy = true;
+    this.calloutTone = "info";
+    this.calloutTitle = "Scanning";
+    this.status = "WASM estimates λ(r); TypeScript paints the curve…";
+    try {
+      const wasm = await loadWasm();
+      const scan = wasm.logisticLyapunovScan(this.rMin, this.rMax, this.steps, 1500, 150);
+      if (!scan) throw new Error("logisticLyapunovScan returned null");
+      const lam = wasm.logisticLyapunov(3.9, 3000, 300);
+      this.lamText = typeof lam === "number" ? lam.toFixed(3) : "—";
+      const canvas = document.querySelector(".lyapunov canvas.canvas") as HTMLCanvasElement | null;
+      if (canvas) paintLyapunovScan(canvas, scan);
+      this.calloutTone = "success";
+      this.calloutTitle = `Logistic Lyapunov · ${this.steps} steps`;
+      this.status = "λ from Rust WASM · polyline from TypeScript canvas (λ>0 ≈ chaos).";
+    } catch (err) {
+      this.calloutTone = "danger";
+      this.calloutTitle = "Scan failed";
+      this.status = err instanceof Error ? err.message : String(err);
+    } finally {
+      this.busy = false;
+    }
+  }
+
+  onStepsInput(event: Event) {
+    const target = event.target as HTMLInputElement | null;
+    if (!target) return;
+    const next = Number.parseInt(target.value, 10);
+    if (!Number.isFinite(next) || next < 64 || next > 1024) return;
+    this.steps = next;
+    this.stepsText = String(next);
+    void this.draw();
+  }
+
+  onRMinInput(event: Event) {
+    const target = event.target as HTMLInputElement | null;
+    if (!target) return;
+    const next = Number.parseFloat(target.value);
+    if (!Number.isFinite(next) || next < 0.5 || next >= this.rMax) return;
+    this.rMin = next;
+    this.rMinText = String(next);
+    void this.draw();
+  }
+
+  onRMaxInput(event: Event) {
+    const target = event.target as HTMLInputElement | null;
+    if (!target) return;
+    const next = Number.parseFloat(target.value);
+    if (!Number.isFinite(next) || next <= this.rMin || next > 4) return;
+    this.rMax = next;
+    this.rMaxText = String(next);
+    void this.draw();
+  }
+
+  redraw() {
+    void this.draw();
+  }
+
+  reset() {
+    this.steps = 320;
+    this.stepsText = "320";
+    this.rMin = 2.5;
+    this.rMinText = "2.5";
+    this.rMax = 4.0;
+    this.rMaxText = "4";
+    void this.draw();
+  }
+}
+</script>
