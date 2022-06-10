@@ -21,13 +21,17 @@ export default class SiteHeader {
   homeCurrent: string | null = null;
   studiosCurrent: string | null = null;
 
-  constructor() {
+  onMount() {
     this.syncNav();
   }
 
   syncNav() {
-    if (typeof window === "undefined") return;
-    const path = window.location.pathname.replace(/\/$/, "") || "/";
+    const pathname =
+      typeof window !== "undefined" && window.location && typeof window.location.pathname === "string"
+        ? window.location.pathname
+        : "";
+    if (!pathname) return;
+    const path = pathname.replace(/\/$/, "") || "/";
     this.homeCurrent = path === "/" ? "page" : null;
     this.studiosCurrent = path !== "/" ? "page" : null;
   }
