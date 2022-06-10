@@ -1,0 +1,17 @@
+<template>
+  <div class="studio">
+    <StudioRail active="turtle" />
+    <header class="studio__head">
+      <p class="studio__eyebrow">Studio</p>
+      <h1>Lindenmayer turtle</h1>
+      <p class="studio__lede">
+        Rust WASM rewrites the L-system and emits turtle points. TypeScript strokes the path.
+      </p>
+    </header>
+    <TurtlePanel />
+  </div>
+</template>
+
+<script client>
+export default class TurtlePage {}
+</script>

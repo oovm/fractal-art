@@ -1,50 +1,62 @@
 <template>
-  <AppShell brand="Fractal" home-href="/" nav-label="Demo">
-    <Space direction="vertical" size="large">
-      <Card
-        title="Lindenmayer turtle"
-        description="Browser demo: Rust WASM computes turtle points; TypeScript paints the canvas. Node packages ship `@doki-land/fractal-<platform>` Node-API binaries."
-      >
-        <TurtlePanel />
-      </Card>
-      <Card
-        title="Barnsley fern (IFS)"
-        description="Second generator family: chaos-game IFS in Rust WASM, point-cloud plot in TypeScript."
-      >
-        <FernPanel />
-      </Card>
-      <Card
-        title="Sierpiński gasket (IFS)"
-        description="Generic IFS surface dogfood: `growSierpinski` preset on the same `sampleIfs` engine."
-      >
-        <SierpinskiPanel />
-      </Card>
-      <Card
-        title="Strange attractors"
-        description="Clifford / de Jong / Lorenz from Rust WASM; TypeScript plots. Type `clifford`, `dejong`, or `lorenz`."
-      >
-        <AttractorPanel />
-      </Card>
-      <Card
-        title="Escape time (Mandelbrot / Julia)"
-        description="Iteration fields from Rust WASM; TypeScript maps values to ImageData. Type `mandelbrot` or `julia` in Family."
-      >
-        <EscapePanel />
-      </Card>
-      <Card
-        title="Logistic Lyapunov"
-        description="Classic chaos diagram: WASM scans λ(r) for x→r·x·(1−x); TypeScript plots the curve (λ>0 ≈ chaos)."
-      >
-        <LyapunovPanel />
-      </Card>
-      <Card
-        title="L-system melody"
-        description="Note events from Rust WASM; TypeScript plays Web Audio or exports SMF (Download MIDI)."
-      >
-        <MelodyPanel />
-      </Card>
-    </Space>
-  </AppShell>
+  <div class="home">
+    <section class="home__hero" aria-label="Fractal">
+      <div class="home__hero-copy">
+        <h1 class="home__brand">Fractal</h1>
+        <p class="home__lede">
+          Generative studios where Rust grows the geometry and TypeScript paints the page.
+        </p>
+        <div class="home__actions">
+          <Button href="/turtle">Open a studio</Button>
+          <Button href="/#studios" variant="secondary">Browse studios</Button>
+        </div>
+      </div>
+    </section>
+
+    <section id="studios" class="home__studios" aria-labelledby="studios-title">
+      <div class="home__studios-head">
+        <h2 id="studios-title">Studios</h2>
+        <p>One generator per route. Pick a family and stay with the canvas.</p>
+      </div>
+      <div class="home__studio-grid">
+        <a class="home__studio-link" href="/turtle">
+          <strong>Lindenmayer turtle</strong>
+          <span>String rewrite grows a plant path; canvas strokes the trail.</span>
+          <em>/turtle</em>
+        </a>
+        <a class="home__studio-link" href="/fern">
+          <strong>Barnsley fern</strong>
+          <span>IFS chaos game cloud with box and correlation dimensions.</span>
+          <em>/fern</em>
+        </a>
+        <a class="home__studio-link" href="/sierpinski">
+          <strong>Sierpiński gasket</strong>
+          <span>Generic IFS surface on the same sample engine.</span>
+          <em>/sierpinski</em>
+        </a>
+        <a class="home__studio-link" href="/attractor">
+          <strong>Strange attractors</strong>
+          <span>Clifford, de Jong, and Lorenz trajectories.</span>
+          <em>/attractor</em>
+        </a>
+        <a class="home__studio-link" href="/escape">
+          <strong>Escape time</strong>
+          <span>Mandelbrot and Julia fields mapped to ImageData.</span>
+          <em>/escape</em>
+        </a>
+        <a class="home__studio-link" href="/lyapunov">
+          <strong>Logistic Lyapunov</strong>
+          <span>λ(r) scan for the classic chaos diagram.</span>
+          <em>/lyapunov</em>
+        </a>
+        <a class="home__studio-link" href="/melody">
+          <strong>L-system melody</strong>
+          <span>Note events through Web Audio and MIDI export.</span>
+          <em>/melody</em>
+        </a>
+      </div>
+    </section>
+  </div>
 </template>
 
 <script client>

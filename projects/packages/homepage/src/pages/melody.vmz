@@ -1,0 +1,17 @@
+<template>
+  <div class="studio">
+    <StudioRail active="melody" />
+    <header class="studio__head">
+      <p class="studio__eyebrow">Studio</p>
+      <h1>L-system melody</h1>
+      <p class="studio__lede">
+        Note events from Rust. TypeScript plays Web Audio or downloads Standard MIDI.
+      </p>
+    </header>
+    <MelodyPanel />
+  </div>
+</template>
+
+<script client>
+export default class MelodyPage {}
+</script>

@@ -1,0 +1,17 @@
+<template>
+  <div class="studio">
+    <StudioRail active="lyapunov" />
+    <header class="studio__head">
+      <p class="studio__eyebrow">Studio</p>
+      <h1>Logistic Lyapunov</h1>
+      <p class="studio__lede">
+        WASM scans λ(r) for the logistic map. TypeScript draws the chaos threshold curve.
+      </p>
+    </header>
+    <LyapunovPanel />
+  </div>
+</template>
+
+<script client>
+export default class LyapunovPage {}
+</script>

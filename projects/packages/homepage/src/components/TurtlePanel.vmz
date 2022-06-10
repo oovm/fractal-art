@@ -43,11 +43,7 @@
 }
 .canvas {
   display: block;
-  width: min(100%, 36rem);
   height: auto;
-  border: 1px solid var(--vmz-line-default);
-  border-radius: var(--vmz-radius-lg, 8px);
-  background: var(--vmz-surface-mist, #f5f5f5);
 }
 </style>
 
@@ -156,9 +152,10 @@ export default class TurtlePanel {
   paint(points: Point2[]) {
     const canvas = document.querySelector(".turtle canvas.canvas") as HTMLCanvasElement | null;
     if (!canvas) return;
-    const mist = getComputedStyle(document.body).getPropertyValue("--vmz-surface-mist").trim() || "#f5f5f5";
-    const stroke = getComputedStyle(document.body).getPropertyValue("--vmz-status-success-accent").trim() || "#52c41a";
-    strokeCanvas(canvas, points, { padding: 16, background: mist, strokeStyle: stroke, lineWidth: 2.4 });
+    const css = getComputedStyle(document.body);
+    const stage = css.getPropertyValue("--vmz-surface-stage").trim() || "#0b1f1c";
+    const stroke = css.getPropertyValue("--vmz-scale-300").trim() || "#5eead4";
+    strokeCanvas(canvas, points, { padding: 16, background: stage, strokeStyle: stroke, lineWidth: 2.2 });
   }
 
   async draw() {

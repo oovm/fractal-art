@@ -62,11 +62,7 @@
 }
 .canvas {
   display: block;
-  width: min(100%, 36rem);
   height: auto;
-  border: 1px solid var(--vmz-line-default);
-  border-radius: var(--vmz-radius-lg, 8px);
-  background: var(--vmz-surface-mist, #f5f5f5);
 }
 </style>
 
@@ -96,15 +92,13 @@ function paintLyapunovScan(canvas: HTMLCanvasElement, scan: LyapunovScan) {
   if (!ctx) throw new Error("2D canvas context unavailable");
   const width = canvas.width;
   const height = canvas.height;
-  const mist = getComputedStyle(document.body).getPropertyValue("--vmz-surface-mist").trim() || "#f5f5f5";
-  const ink = getComputedStyle(document.body).getPropertyValue("--vmz-text-primary").trim() || "#1f1f1f";
-  const accent =
-    getComputedStyle(document.body).getPropertyValue("--vmz-status-danger-accent").trim() || "#cf1322";
-  const zero =
-    getComputedStyle(document.body).getPropertyValue("--vmz-line-default").trim() || "#d9d9d9";
+  const css = getComputedStyle(document.body);
+  const stage = css.getPropertyValue("--vmz-surface-stage").trim() || "#0b1f1c";
+  const accent = css.getPropertyValue("--vmz-brand-energy").trim() || "#e11d48";
+  const zero = css.getPropertyValue("--vmz-scale-700").trim() || "#0f766e";
 
   ctx.clearRect(0, 0, width, height);
-  ctx.fillStyle = mist;
+  ctx.fillStyle = stage;
   ctx.fillRect(0, 0, width, height);
 
   const values = [...scan.values];

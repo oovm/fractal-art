@@ -1,0 +1,17 @@
+<template>
+  <div class="studio">
+    <StudioRail active="attractor" />
+    <header class="studio__head">
+      <p class="studio__eyebrow">Studio</p>
+      <h1>Strange attractors</h1>
+      <p class="studio__lede">
+        Clifford, de Jong, or Lorenz from WASM. TypeScript densifies the orbit on canvas.
+      </p>
+    </header>
+    <AttractorPanel />
+  </div>
+</template>
+
+<script client>
+export default class AttractorPage {}
+</script>

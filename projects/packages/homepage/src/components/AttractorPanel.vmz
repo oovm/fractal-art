@@ -49,11 +49,7 @@
 }
 .canvas {
   display: block;
-  width: min(100%, 36rem);
   height: auto;
-  border: 1px solid var(--vmz-line-default);
-  border-radius: var(--vmz-radius-lg, 8px);
-  background: var(--vmz-surface-mist, #f5f5f5);
 }
 </style>
 
@@ -184,10 +180,10 @@ export default class AttractorPanel {
   paint(points: Point2[]) {
     const canvas = document.querySelector(".attractor canvas.canvas") as HTMLCanvasElement | null;
     if (!canvas) return;
-    const mist = getComputedStyle(document.body).getPropertyValue("--vmz-surface-mist").trim() || "#f5f5f5";
-    const fill =
-      getComputedStyle(document.body).getPropertyValue("--vmz-status-runtime-accent").trim() || "#722ed1";
-    plotCanvas(canvas, points, { padding: 8, background: mist, fillStyle: fill, pointSize: 1 });
+    const css = getComputedStyle(document.body);
+    const stage = css.getPropertyValue("--vmz-surface-stage").trim() || "#0b1f1c";
+    const fill = css.getPropertyValue("--vmz-brand-energy").trim() || "#e11d48";
+    plotCanvas(canvas, points, { padding: 8, background: stage, fillStyle: fill, pointSize: 1 });
   }
 
   async draw() {

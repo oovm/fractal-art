@@ -1,0 +1,35 @@
+<template>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="site-brand" href="/" aria-label="Fractal home">
+        <span class="site-brand__mark">Fractal</span>
+        <span class="site-brand__tag">Art</span>
+      </a>
+
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/" :aria-current="homeCurrent">Home</a>
+        <a href="/#studios" :aria-current="studiosCurrent">Studios</a>
+      </nav>
+
+      <code class="site-header__pkg">@doki-land/fractal</code>
+    </div>
+  </header>
+</template>
+
+<script client>
+export default class SiteHeader {
+  homeCurrent: string | null = null;
+  studiosCurrent: string | null = null;
+
+  constructor() {
+    this.syncNav();
+  }
+
+  syncNav() {
+    if (typeof window === "undefined") return;
+    const path = window.location.pathname.replace(/\/$/, "") || "/";
+    this.homeCurrent = path === "/" ? "page" : null;
+    this.studiosCurrent = path !== "/" ? "page" : null;
+  }
+}
+</script>

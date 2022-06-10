@@ -1,0 +1,17 @@
+<template>
+  <div class="studio">
+    <StudioRail active="fern" />
+    <header class="studio__head">
+      <p class="studio__eyebrow">Studio</p>
+      <h1>Barnsley fern</h1>
+      <p class="studio__lede">
+        Chaos-game IFS in Rust. TypeScript plots the cloud and shows fractal dimensions.
+      </p>
+    </header>
+    <FernPanel />
+  </div>
+</template>
+
+<script client>
+export default class FernPage {}
+</script>

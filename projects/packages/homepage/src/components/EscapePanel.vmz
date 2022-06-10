@@ -58,11 +58,7 @@
 }
 .canvas {
   display: block;
-  width: min(100%, 36rem);
   height: auto;
-  border: 1px solid var(--vmz-line-default);
-  border-radius: var(--vmz-radius-lg, 8px);
-  background: #080810;
 }
 </style>
 

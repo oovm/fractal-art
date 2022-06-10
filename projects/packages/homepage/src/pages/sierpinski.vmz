@@ -1,0 +1,17 @@
+<template>
+  <div class="studio">
+    <StudioRail active="sierpinski" />
+    <header class="studio__head">
+      <p class="studio__eyebrow">Studio</p>
+      <h1>Sierpiński gasket</h1>
+      <p class="studio__lede">
+        Preset IFS on the shared sample engine. Same paint path as the fern studio.
+      </p>
+    </header>
+    <SierpinskiPanel />
+  </div>
+</template>
+
+<script client>
+export default class SierpinskiPage {}
+</script>

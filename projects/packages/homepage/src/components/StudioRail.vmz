@@ -1,0 +1,28 @@
+<template>
+  <nav class="studio-rail" aria-label="Studios">
+    <a
+      v-for="item in items"
+      :key="item.id"
+      :href="item.href"
+      :aria-current="item.id === active ? 'page' : null"
+    >
+      {{ item.title }}
+    </a>
+  </nav>
+</template>
+
+<script client>
+export default class StudioRail {
+  public active: string = "";
+
+  items = [
+    { id: "turtle", title: "Turtle", href: "/turtle" },
+    { id: "fern", title: "Fern", href: "/fern" },
+    { id: "sierpinski", title: "Sierpiński", href: "/sierpinski" },
+    { id: "attractor", title: "Attractor", href: "/attractor" },
+    { id: "escape", title: "Escape", href: "/escape" },
+    { id: "lyapunov", title: "Lyapunov", href: "/lyapunov" },
+    { id: "melody", title: "Melody", href: "/melody" },
+  ];
+}
+</script>

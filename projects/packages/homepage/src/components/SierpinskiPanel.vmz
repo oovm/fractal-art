@@ -52,11 +52,7 @@
 }
 .canvas {
   display: block;
-  width: min(100%, 36rem);
   height: auto;
-  border: 1px solid var(--vmz-line-default);
-  border-radius: var(--vmz-radius-lg, 8px);
-  background: var(--vmz-surface-mist, #f5f5f5);
 }
 </style>
 
@@ -176,9 +172,10 @@ export default class SierpinskiPanel {
   paint(points: Point2[]) {
     const canvas = document.querySelector(".sierpinski canvas.canvas") as HTMLCanvasElement | null;
     if (!canvas) return;
-    const mist = getComputedStyle(document.body).getPropertyValue("--vmz-surface-mist").trim() || "#f5f5f5";
-    const fill = getComputedStyle(document.body).getPropertyValue("--vmz-brand-primary").trim() || "#1677ff";
-    plotCanvas(canvas, points, { padding: 16, background: mist, fillStyle: fill, pointSize: 1 });
+    const css = getComputedStyle(document.body);
+    const stage = css.getPropertyValue("--vmz-surface-stage").trim() || "#0b1f1c";
+    const fill = css.getPropertyValue("--vmz-scale-300").trim() || "#5eead4";
+    plotCanvas(canvas, points, { padding: 16, background: stage, fillStyle: fill, pointSize: 1 });
   }
 
   async draw() {
