@@ -109,6 +109,14 @@ const fern = growFern(20_000, 1);
 console.log(boxCountingDimension(fern.points), correlationDimension(fern.points));
 ```
 
+```js
+import { logisticLyapunov, logisticLyapunovScan } from "@doki-land/fractal";
+
+console.log(logisticLyapunov(3.9));
+const scan = logisticLyapunovScan(2.5, 4.0, 256);
+console.log(scan?.steps, scan?.values[0]);
+```
+
 ## Web (homepage)
 
 ```bash

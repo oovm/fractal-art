@@ -8,6 +8,8 @@ import {
     growPlant,
     growSierpinski,
     julia,
+    logisticLyapunov,
+    logisticLyapunovScan,
     mandelbrot,
     rewrite,
     sampleClifford,
@@ -165,5 +167,25 @@ describe("correlationDimension", () => {
         const dim = correlationDimension(fern.points, 350);
         assert.equal(typeof dim, "number");
         assert.ok(dim! > 1 && dim! < 2, `dim=${dim}`);
+    });
+});
+
+describe("logisticLyapunov", () => {
+    it("is negative for stable r=2 and positive near r=3.9", () => {
+        const stable = logisticLyapunov(2, 2_000, 200);
+        const chaotic = logisticLyapunov(3.9, 4_000, 400);
+        assert.equal(typeof stable, "number");
+        assert.equal(typeof chaotic, "number");
+        assert.ok(stable! < -0.5, `stable=${stable}`);
+        assert.ok(chaotic! > 0, `chaotic=${chaotic}`);
+    });
+
+    it("scans a range with both signs", () => {
+        const scan = logisticLyapunovScan(2.5, 4.0, 64, 1_500, 150);
+        assert.ok(scan);
+        assert.equal(scan!.steps, 64);
+        assert.equal(scan!.values.length, 64);
+        assert.ok([...scan!.values].some((v) => v < 0));
+        assert.ok([...scan!.values].some((v) => v > 0));
     });
 });

@@ -42,6 +42,13 @@ export type Melody = {
     count: number;
 };
 
+export type LyapunovScan = {
+    rMin: number;
+    rMax: number;
+    steps: number;
+    values: number[] | Float64Array;
+};
+
 type FractalBinding = {
     rewrite: (axiom: string, rules: string[], iterations: number) => string;
     growPlant: (iterations: number, step: number, turnDegrees: number) => {
@@ -134,6 +141,19 @@ type FractalBinding = {
     };
     boxCountingDimension: (points: Point2[], minBoxes: number) => number | null;
     correlationDimension: (points: Point2[], maxPoints: number) => number | null;
+    logisticLyapunov: (r: number, iterations: number, burnIn: number) => number | null;
+    logisticLyapunovScan: (
+        rMin: number,
+        rMax: number,
+        steps: number,
+        iterations: number,
+        burnIn: number,
+    ) => {
+        rMin: number;
+        rMax: number;
+        steps: number;
+        values: number[] | Float64Array;
+    } | null;
 };
 
 /** Platform package map — same shape as `@doki-land/nifty-<platform>`. */

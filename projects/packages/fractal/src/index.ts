@@ -7,7 +7,16 @@
  * Build the binding first: `pnpm build:napi`
  */
 
-export type { Affine2, EscapeField, Melody, NoteEvent, PlantPath, Point2, PointCloud } from "./native.ts";
+export type {
+    Affine2,
+    EscapeField,
+    LyapunovScan,
+    Melody,
+    NoteEvent,
+    PlantPath,
+    Point2,
+    PointCloud,
+} from "./native.ts";
 export { loadFractalNative } from "./native.ts";
 export {
     fitBounds,
@@ -35,6 +44,7 @@ import {
     loadFractalNative,
     type Affine2,
     type EscapeField,
+    type LyapunovScan,
     type Melody,
     type PlantPath,
     type PointCloud,
@@ -152,4 +162,20 @@ export function correlationDimension(
     maxPoints = 400,
 ): number | null {
     return loadFractalNative().correlationDimension(points, maxPoints);
+}
+
+/** Lyapunov exponent of the logistic map at parameter `r`. */
+export function logisticLyapunov(r: number, iterations = 4_000, burnIn = 400): number | null {
+    return loadFractalNative().logisticLyapunov(r, iterations, burnIn);
+}
+
+/** Scan logistic Lyapunov exponents over `[rMin, rMax]`. */
+export function logisticLyapunovScan(
+    rMin = 2.5,
+    rMax = 4.0,
+    steps = 256,
+    iterations = 2_000,
+    burnIn = 200,
+): LyapunovScan | null {
+    return loadFractalNative().logisticLyapunovScan(rMin, rMax, steps, iterations, burnIn);
 }
