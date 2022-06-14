@@ -1,5 +1,6 @@
 <template>
-  <Space direction="vertical" size="large" class="escape">
+  <div class="escape">
+  <Space direction="vertical" size="large">
     <Space wrap size="middle" class="toolbar">
       <Field
         label="Family"
@@ -45,6 +46,7 @@
       {{ family }} · {{ width }}×{{ height }} · maxIter {{ maxIter }}
     </Typography>
   </Space>
+  </div>
 </template>
 
 <style>

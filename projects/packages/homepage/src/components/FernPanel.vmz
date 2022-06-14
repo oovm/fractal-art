@@ -1,5 +1,6 @@
 <template>
-  <Space direction="vertical" size="large" class="fern">
+  <div class="fern">
+  <Space direction="vertical" size="large">
     <Space wrap size="middle" class="toolbar">
       <Field
         label="Samples"
@@ -40,6 +41,7 @@
       Points: {{ pointCount }} · Seed: {{ seed }} · Box ≈ {{ dimText }} · Corr ≈ {{ corrText }}
     </Typography>
   </Space>
+  </div>
 </template>
 
 <style>

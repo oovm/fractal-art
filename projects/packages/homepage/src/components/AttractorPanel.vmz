@@ -1,5 +1,6 @@
 <template>
-  <Space direction="vertical" size="large" class="attractor">
+  <div class="attractor">
+  <Space direction="vertical" size="large">
     <Space wrap size="middle" class="toolbar">
       <Field
         label="Family"
@@ -36,6 +37,7 @@
       {{ family }} · Points: {{ pointCount }} · Box ≈ {{ dimText }} · Corr ≈ {{ corrText }}
     </Typography>
   </Space>
+  </div>
 </template>
 
 <style>

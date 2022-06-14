@@ -1,5 +1,6 @@
 <template>
-  <Space direction="vertical" size="large" class="lyapunov">
+  <div class="lyapunov">
+  <Space direction="vertical" size="large">
     <Space wrap size="middle" class="toolbar">
       <Field
         label="Steps"
@@ -49,6 +50,7 @@
       Steps: {{ steps }} · r ∈ [{{ rMin }}, {{ rMax }}] · λ@3.9 ≈ {{ lamText }}
     </Typography>
   </Space>
+  </div>
 </template>
 
 <style>

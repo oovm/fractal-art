@@ -1,5 +1,6 @@
 <template>
-  <Space direction="vertical" size="large" class="turtle">
+  <div class="turtle">
+  <Space direction="vertical" size="large">
     <Space wrap size="middle" class="toolbar">
       <Field
         label="Iterations"
@@ -30,6 +31,7 @@
       Points: {{ pointCount }} · String length: {{ sourceLength }}
     </Typography>
   </Space>
+  </div>
 </template>
 
 <style>

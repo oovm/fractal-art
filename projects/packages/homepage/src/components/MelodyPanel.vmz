@@ -1,5 +1,6 @@
 <template>
-  <Space direction="vertical" size="large" class="melody">
+  <div class="melody">
+  <Space direction="vertical" size="large">
     <Space wrap size="middle" class="toolbar">
       <Field
         label="Iterations"
@@ -40,6 +41,7 @@
       Notes: {{ noteCount }} · Tempo: {{ tempo }} BPM · Root MIDI: {{ seedMidi }}
     </Typography>
   </Space>
+  </div>
 </template>
 
 <style>
