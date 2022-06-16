@@ -13,7 +13,10 @@
           <ul>
             <li><a href="/turtle">Turtle</a></li>
             <li><a href="/fern">Fern</a></li>
+            <li><a href="/sierpinski">Sierpiński</a></li>
+            <li><a href="/attractor">Attractor</a></li>
             <li><a href="/escape">Escape</a></li>
+            <li><a href="/lyapunov">Lyapunov</a></li>
             <li><a href="/melody">Melody</a></li>
           </ul>
         </div>
