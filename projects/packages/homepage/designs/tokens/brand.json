@@ -45,6 +45,6 @@
     "font": {
         "sans": "\"Source Sans 3\", \"Segoe UI\", \"Helvetica Neue\", Arial, sans-serif",
         "mono": "\"IBM Plex Mono\", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
-        "display": "\"Syne\", \"Source Sans 3\", \"Segoe UI\", sans-serif"
+        "display": "\"Fraunces\", \"Iowan Old Style\", Georgia, serif"
     }
 }

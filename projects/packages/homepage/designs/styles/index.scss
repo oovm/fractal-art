@@ -1,5 +1,5 @@
 /* Fractal homepage — atmospheric surface. Tokens from designs/tokens/*.json */
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;500;600;700&family=Syne:wght@500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;500;600;700&display=swap");
 
 *,
 *::before,
@@ -81,9 +81,10 @@ a {
 
 .site-brand__mark {
   font-family: var(--vmz-font-display);
-  font-size: 1.55rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-size: 1.45rem;
+  font-weight: 700;
+  font-optical-sizing: auto;
+  letter-spacing: -0.02em;
   color: var(--vmz-text-ink);
 }
 
@@ -158,9 +159,10 @@ a {
 .site-footer__brand {
   margin: 0;
   font-family: var(--vmz-font-display);
-  font-size: 1.35rem;
+  font-size: 1.3rem;
   font-weight: 700;
-  letter-spacing: -0.03em;
+  font-optical-sizing: auto;
+  letter-spacing: -0.015em;
 }
 
 .site-footer__blurb {
@@ -279,10 +281,11 @@ a {
 .home__brand {
   margin: 0;
   font-family: var(--vmz-font-display);
-  font-size: clamp(3.4rem, 10vw, 6.2rem);
-  font-weight: 800;
-  letter-spacing: -0.055em;
-  line-height: 0.92;
+  font-size: clamp(3.2rem, 9vw, 5.6rem);
+  font-weight: 700;
+  font-optical-sizing: auto;
+  letter-spacing: -0.025em;
+  line-height: 0.98;
   animation: fractal-rise 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -338,9 +341,10 @@ a {
 .home__studios-head h2 {
   margin: 0;
   font-family: var(--vmz-font-display);
-  font-size: clamp(1.8rem, 3.5vw, 2.4rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-size: clamp(1.75rem, 3.2vw, 2.25rem);
+  font-weight: 650;
+  font-optical-sizing: auto;
+  letter-spacing: -0.015em;
 }
 
 .home__studios-head p {
@@ -372,9 +376,10 @@ a {
 
 .home__studio-link strong {
   font-family: var(--vmz-font-display);
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 1.12rem;
+  font-weight: 650;
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
 }
 
 .home__studio-link span {
@@ -444,10 +449,11 @@ a {
 .studio__head h1 {
   margin: 0;
   font-family: var(--vmz-font-display);
-  font-size: clamp(1.9rem, 4vw, 2.6rem);
-  font-weight: 750;
-  letter-spacing: -0.035em;
-  line-height: 1.1;
+  font-size: clamp(1.85rem, 3.6vw, 2.45rem);
+  font-weight: 700;
+  font-optical-sizing: auto;
+  letter-spacing: -0.015em;
+  line-height: 1.12;
 }
 
 .studio__lede {
