@@ -69,6 +69,8 @@
 </style>
 
 <script client>
+import { isFractalWasmReady, loadFractalWasm } from "../lib/fractal-wasm.ts";
+
 type LyapunovScan = {
   rMin: number;
   rMax: number;
@@ -76,17 +78,6 @@ type LyapunovScan = {
   values: number[] | Float64Array;
 };
 
-type WasmModule = {
-  default: (input?: RequestInfo | URL | Response | BufferSource | WebAssembly.Module) => Promise<unknown>;
-  logisticLyapunov: (r: number, iterations: number, burnIn: number) => number | null;
-  logisticLyapunovScan: (
-    rMin: number,
-    rMax: number,
-    steps: number,
-    iterations: number,
-    burnIn: number,
-  ) => LyapunovScan | null;
-};
 
 /** TS render: plot λ(r) polyline (positive above zero line = chaos). */
 function paintLyapunovScan(canvas: HTMLCanvasElement, scan: LyapunovScan) {
@@ -142,17 +133,6 @@ function paintLyapunovScan(canvas: HTMLCanvasElement, scan: LyapunovScan) {
   ctx.fillText(`${scan.rMax}`, width - pad - 24, height - 4);
 }
 
-let wasmReady: Promise<WasmModule> | null = null;
-
-function loadWasm(): Promise<WasmModule> {
-  if (!wasmReady) {
-    wasmReady = import("/wasm/fractal_wasm.js").then(async (mod: WasmModule) => {
-      await mod.default("/wasm/fractal_wasm_bg.wasm");
-      return mod;
-    });
-  }
-  return wasmReady;
-}
 
 export default class LyapunovPanel {
   steps = 320;
@@ -162,7 +142,7 @@ export default class LyapunovPanel {
   rMax = 4.0;
   rMaxText = "4";
   lamText = "—";
-  status = "Loading WASM Lyapunov engine…";
+  status = isFractalWasmReady() ? "Warming canvas…" : "Loading WASM Lyapunov engine…";
   busy = false;
   calloutTone = "info";
   calloutTitle = "Status";
@@ -178,7 +158,7 @@ export default class LyapunovPanel {
     this.calloutTitle = "Scanning";
     this.status = "WASM estimates λ(r); TypeScript paints the curve…";
     try {
-      const wasm = await loadWasm();
+      const wasm = await loadFractalWasm();
       const scan = wasm.logisticLyapunovScan(this.rMin, this.rMax, this.steps, 1500, 150);
       if (!scan) throw new Error("logisticLyapunovScan returned null");
       const lam = wasm.logisticLyapunov(3.9, 3000, 300);

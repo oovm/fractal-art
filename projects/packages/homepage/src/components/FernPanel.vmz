@@ -60,18 +60,13 @@
 </style>
 
 <script client>
+import { isFractalWasmReady, loadFractalWasm } from "../lib/fractal-wasm.ts";
+
 type Point2 = { x: number; y: number };
 
 type PointCloud = {
   points: Point2[];
   count: number;
-};
-
-type WasmModule = {
-  default: (input?: RequestInfo | URL | Response | BufferSource | WebAssembly.Module) => Promise<unknown>;
-  growFern: (iterations: number, seed: number) => PointCloud;
-  boxCountingDimension: (points: Point2[], minBoxes: number) => number | null;
-  correlationDimension: (points: Point2[], maxPoints: number) => number | null;
 };
 
 type FitBounds = { minX: number; minY: number; width: number; height: number };
@@ -133,24 +128,12 @@ function plotCanvas(
   }
 }
 
-let wasmReady: Promise<WasmModule> | null = null;
-
-function loadWasm(): Promise<WasmModule> {
-  if (!wasmReady) {
-    wasmReady = import("/wasm/fractal_wasm.js").then(async (mod: WasmModule) => {
-      await mod.default("/wasm/fractal_wasm_bg.wasm");
-      return mod;
-    });
-  }
-  return wasmReady;
-}
-
 export default class FernPanel {
   samples = 40_000;
   samplesText = "40000";
   seed = 42;
   seedText = "42";
-  status = "Loading WASM IFS engine…";
+  status = isFractalWasmReady() ? "Warming canvas…" : "Loading WASM IFS engine…";
   pointCount = 0;
   dimText = "—";
   corrText = "—";
@@ -176,9 +159,11 @@ export default class FernPanel {
     this.busy = true;
     this.calloutTone = "info";
     this.calloutTitle = "Sampling";
-    this.status = "WASM runs the chaos game; TypeScript plots the point cloud…";
+    this.status = isFractalWasmReady()
+      ? "WASM runs the chaos game; TypeScript plots the point cloud…"
+      : "Loading WASM IFS engine…";
     try {
-      const wasm = await loadWasm();
+      const wasm = await loadFractalWasm();
       const result = wasm.growFern(this.samples, this.seed);
       this.pointCount = result.count;
       const dim = wasm.boxCountingDimension(result.points, 2);

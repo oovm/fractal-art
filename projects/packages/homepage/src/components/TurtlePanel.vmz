@@ -50,17 +50,14 @@
 </style>
 
 <script client>
+import { isFractalWasmReady, loadFractalWasm } from "../lib/fractal-wasm.ts";
+
 type Point2 = { x: number; y: number };
 
 type PlantPath = {
   points: Point2[];
   source: string;
   sourceLength: number;
-};
-
-type WasmModule = {
-  default: (input?: RequestInfo | URL | Response | BufferSource | WebAssembly.Module) => Promise<unknown>;
-  growPlant: (iterations: number, step: number, turnDegrees: number) => PlantPath;
 };
 
 type FitBounds = { minX: number; minY: number; width: number; height: number };
@@ -125,22 +122,10 @@ function strokeCanvas(
   ctx.stroke();
 }
 
-let wasmReady: Promise<WasmModule> | null = null;
-
-function loadWasm(): Promise<WasmModule> {
-  if (!wasmReady) {
-    wasmReady = import("/wasm/fractal_wasm.js").then(async (mod: WasmModule) => {
-      await mod.default("/wasm/fractal_wasm_bg.wasm");
-      return mod;
-    });
-  }
-  return wasmReady;
-}
-
 export default class TurtlePanel {
   iterations = 3;
   iterationsText = "3";
-  status = "Loading WASM plant engine…";
+  status = isFractalWasmReady() ? "Warming canvas…" : "Loading WASM plant engine…";
   sourceLength = 0;
   pointCount = 0;
   busy = false;
@@ -165,9 +150,11 @@ export default class TurtlePanel {
     this.busy = true;
     this.calloutTone = "info";
     this.calloutTitle = "Growing";
-    this.status = "WASM computes turtle points; TypeScript strokes the canvas…";
+    this.status = isFractalWasmReady()
+      ? "WASM computes turtle points; TypeScript strokes the canvas…"
+      : "Loading WASM plant engine…";
     try {
-      const wasm = await loadWasm();
+      const wasm = await loadFractalWasm();
       const result = wasm.growPlant(this.iterations, 8, 25);
       this.sourceLength = result.sourceLength;
       this.pointCount = result.points.length;

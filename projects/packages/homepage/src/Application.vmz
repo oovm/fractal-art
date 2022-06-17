@@ -9,5 +9,11 @@
 </template>
 
 <script client>
-export default class Application {}
+import { prefetchFractalWasm } from "./lib/fractal-wasm.ts";
+
+export default class Application {
+  onMount() {
+    prefetchFractalWasm();
+  }
+}
 </script>

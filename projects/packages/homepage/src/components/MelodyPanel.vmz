@@ -56,6 +56,8 @@
 </style>
 
 <script client>
+import { isFractalWasmReady, loadFractalWasm } from "../lib/fractal-wasm.ts";
+
 type NoteEvent = {
   time: number;
   midi: number;
@@ -68,10 +70,6 @@ type Melody = {
   count: number;
 };
 
-type WasmModule = {
-  default: (input?: RequestInfo | URL | Response | BufferSource | WebAssembly.Module) => Promise<unknown>;
-  growMelody: (iterations: number, tempoBpm: number, seedMidi: number) => Melody;
-};
 
 function midiToHz(midi: number): number {
   return 440 * 2 ** ((midi - 69) / 12);
@@ -160,17 +158,6 @@ function toMidiBytes(melody: Melody, tempoBpm = 120, ppq = 480): Uint8Array {
   return Uint8Array.from(header);
 }
 
-let wasmReady: Promise<WasmModule> | null = null;
-
-function loadWasm(): Promise<WasmModule> {
-  if (!wasmReady) {
-    wasmReady = import("/wasm/fractal_wasm.js").then(async (mod: WasmModule) => {
-      await mod.default("/wasm/fractal_wasm_bg.wasm");
-      return mod;
-    });
-  }
-  return wasmReady;
-}
 
 export default class MelodyPanel {
   iterations = 3;
@@ -192,7 +179,7 @@ export default class MelodyPanel {
     this.calloutTitle = "Playing";
     this.status = "WASM builds the score; TypeScript schedules oscillators…";
     try {
-      const wasm = await loadWasm();
+      const wasm = await loadFractalWasm();
       const melody = wasm.growMelody(this.iterations, this.tempo, this.seedMidi);
       this.noteCount = melody.count;
       await playMelody(melody);
@@ -215,7 +202,7 @@ export default class MelodyPanel {
     this.calloutTitle = "Exporting";
     this.status = "WASM builds events; TypeScript encodes SMF…";
     try {
-      const wasm = await loadWasm();
+      const wasm = await loadFractalWasm();
       const melody = wasm.growMelody(this.iterations, this.tempo, this.seedMidi);
       this.noteCount = melody.count;
       const bytes = toMidiBytes(melody, this.tempo);

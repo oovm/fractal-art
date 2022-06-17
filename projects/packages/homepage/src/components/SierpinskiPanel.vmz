@@ -59,6 +59,8 @@
 </style>
 
 <script client>
+import { isFractalWasmReady, loadFractalWasm } from "../lib/fractal-wasm.ts";
+
 type Point2 = { x: number; y: number };
 
 type PointCloud = {
@@ -76,13 +78,6 @@ type Affine2 = {
   weight: number;
 };
 
-type WasmModule = {
-  default: (input?: RequestInfo | URL | Response | BufferSource | WebAssembly.Module) => Promise<unknown>;
-  growSierpinski: (iterations: number, seed: number) => PointCloud;
-  sampleIfs: (maps: Affine2[], iterations: number, seed: number, burnIn: number) => PointCloud;
-  boxCountingDimension: (points: Point2[], minBoxes: number) => number | null;
-  correlationDimension: (points: Point2[], maxPoints: number) => number | null;
-};
 
 type FitBounds = { minX: number; minY: number; width: number; height: number };
 
@@ -142,24 +137,13 @@ function plotCanvas(
   }
 }
 
-let wasmReady: Promise<WasmModule> | null = null;
-
-function loadWasm(): Promise<WasmModule> {
-  if (!wasmReady) {
-    wasmReady = import("/wasm/fractal_wasm.js").then(async (mod: WasmModule) => {
-      await mod.default("/wasm/fractal_wasm_bg.wasm");
-      return mod;
-    });
-  }
-  return wasmReady;
-}
 
 export default class SierpinskiPanel {
   samples = 40_000;
   samplesText = "40000";
   seed = 3;
   seedText = "3";
-  status = "Loading WASM IFS engine…";
+  status = isFractalWasmReady() ? "Warming canvas…" : "Loading WASM IFS engine…";
   pointCount = 0;
   dimText = "—";
   corrText = "—";
@@ -187,7 +171,7 @@ export default class SierpinskiPanel {
     this.calloutTitle = "Sampling";
     this.status = "WASM samples the gasket; TypeScript plots the point cloud…";
     try {
-      const wasm = await loadWasm();
+      const wasm = await loadFractalWasm();
       const result = wasm.growSierpinski(this.samples, this.seed);
       this.pointCount = result.count;
       const dim = wasm.boxCountingDimension(result.points, 2);

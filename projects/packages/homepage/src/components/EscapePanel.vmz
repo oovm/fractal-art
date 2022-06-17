@@ -65,6 +65,8 @@
 </style>
 
 <script client>
+import { isFractalWasmReady, loadFractalWasm } from "../lib/fractal-wasm.ts";
+
 type EscapeField = {
   width: number;
   height: number;
@@ -72,27 +74,6 @@ type EscapeField = {
   values: number[] | Uint16Array;
 };
 
-type WasmModule = {
-  default: (input?: RequestInfo | URL | Response | BufferSource | WebAssembly.Module) => Promise<unknown>;
-  mandelbrot: (
-    width: number,
-    height: number,
-    centerX: number,
-    centerY: number,
-    scale: number,
-    maxIter: number,
-  ) => EscapeField;
-  julia: (
-    width: number,
-    height: number,
-    centerX: number,
-    centerY: number,
-    scale: number,
-    cx: number,
-    cy: number,
-    maxIter: number,
-  ) => EscapeField;
-};
 
 function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
   const hue = ((h % 360) + 360) % 360;
@@ -165,17 +146,6 @@ function paintEscapeField(
   ctx.putImageData(image, 0, 0);
 }
 
-let wasmReady: Promise<WasmModule> | null = null;
-
-function loadWasm(): Promise<WasmModule> {
-  if (!wasmReady) {
-    wasmReady = import("/wasm/fractal_wasm.js").then(async (mod: WasmModule) => {
-      await mod.default("/wasm/fractal_wasm_bg.wasm");
-      return mod;
-    });
-  }
-  return wasmReady;
-}
 
 export default class EscapePanel {
   family = "mandelbrot";
@@ -185,7 +155,7 @@ export default class EscapePanel {
   maxIterText = "80";
   scale = 3;
   scaleText = "3";
-  status = "Loading WASM escape engine…";
+  status = isFractalWasmReady() ? "Warming canvas…" : "Loading WASM escape engine…";
   busy = false;
   calloutTone = "info";
   calloutTitle = "Status";
@@ -201,7 +171,7 @@ export default class EscapePanel {
     this.calloutTitle = "Sampling";
     this.status = "WASM fills the iteration field; TypeScript paints pixels…";
     try {
-      const wasm = await loadWasm();
+      const wasm = await loadFractalWasm();
       const field =
         this.family === "julia"
           ? wasm.julia(this.width, this.height, 0, 0, this.scale, -0.8, 0.156, this.maxIter)
