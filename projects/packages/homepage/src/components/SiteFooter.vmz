@@ -11,13 +11,13 @@
         <div>
           <h2>Studios</h2>
           <ul>
-            <li><a href="/turtle">Turtle</a></li>
-            <li><a href="/fern">Fern</a></li>
-            <li><a href="/sierpinski">Sierpiński</a></li>
-            <li><a href="/attractor">Attractor</a></li>
-            <li><a href="/escape">Escape</a></li>
-            <li><a href="/lyapunov">Lyapunov</a></li>
-            <li><a href="/melody">Melody</a></li>
+            <li><Link to="TurtlePage">Turtle</Link></li>
+            <li><Link to="FernPage">Fern</Link></li>
+            <li><Link to="SierpinskiPage">Sierpiński</Link></li>
+            <li><Link to="AttractorPage">Attractor</Link></li>
+            <li><Link to="EscapePage">Escape</Link></li>
+            <li><Link to="LyapunovPage">Lyapunov</Link></li>
+            <li><Link to="MelodyPage">Melody</Link></li>
           </ul>
         </div>
       </div>

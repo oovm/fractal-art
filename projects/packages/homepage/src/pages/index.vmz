@@ -7,8 +7,8 @@
           Generative studios where Rust grows the geometry and TypeScript paints the page.
         </p>
         <div class="home__actions">
-          <Button href="/turtle">Open a studio</Button>
-          <Button href="/#studios" variant="secondary">Browse studios</Button>
+          <Link to="TurtlePage" class="home__cta home__cta--primary">Open a studio</Link>
+          <a href="/#studios" data-vmz-route="IndexPage" class="home__cta home__cta--secondary">Browse studios</a>
         </div>
       </div>
     </section>
@@ -19,41 +19,41 @@
         <p>One generator per route. Pick a family and stay with the canvas.</p>
       </div>
       <div class="home__studio-grid">
-        <a class="home__studio-link" href="/turtle">
+        <Link to="TurtlePage" class="home__studio-link">
           <strong>Lindenmayer turtle</strong>
           <span>String rewrite grows a plant path; canvas strokes the trail.</span>
           <em>/turtle</em>
-        </a>
-        <a class="home__studio-link" href="/fern">
+        </Link>
+        <Link to="FernPage" class="home__studio-link">
           <strong>Barnsley fern</strong>
           <span>IFS chaos game cloud with box and correlation dimensions.</span>
           <em>/fern</em>
-        </a>
-        <a class="home__studio-link" href="/sierpinski">
+        </Link>
+        <Link to="SierpinskiPage" class="home__studio-link">
           <strong>Sierpiński gasket</strong>
           <span>Generic IFS surface on the same sample engine.</span>
           <em>/sierpinski</em>
-        </a>
-        <a class="home__studio-link" href="/attractor">
+        </Link>
+        <Link to="AttractorPage" class="home__studio-link">
           <strong>Strange attractors</strong>
           <span>Clifford, de Jong, and Lorenz trajectories.</span>
           <em>/attractor</em>
-        </a>
-        <a class="home__studio-link" href="/escape">
+        </Link>
+        <Link to="EscapePage" class="home__studio-link">
           <strong>Escape time</strong>
           <span>Mandelbrot and Julia fields mapped to ImageData.</span>
           <em>/escape</em>
-        </a>
-        <a class="home__studio-link" href="/lyapunov">
+        </Link>
+        <Link to="LyapunovPage" class="home__studio-link">
           <strong>Logistic Lyapunov</strong>
           <span>λ(r) scan for the classic chaos diagram.</span>
           <em>/lyapunov</em>
-        </a>
-        <a class="home__studio-link" href="/melody">
+        </Link>
+        <Link to="MelodyPage" class="home__studio-link">
           <strong>L-system melody</strong>
           <span>Note events through Web Audio and MIDI export.</span>
           <em>/melody</em>
-        </a>
+        </Link>
       </div>
     </section>
   </div>

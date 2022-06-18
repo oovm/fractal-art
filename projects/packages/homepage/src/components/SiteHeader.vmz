@@ -1,14 +1,14 @@
 <template>
   <header class="site-header">
     <div class="site-header__inner">
-      <a class="site-brand" href="/" aria-label="Fractal home">
+      <Link to="IndexPage" class="site-brand" aria-label="Fractal home">
         <span class="site-brand__mark">Fractal</span>
         <span class="site-brand__tag">Art</span>
-      </a>
+      </Link>
 
       <nav class="site-nav" aria-label="Primary">
-        <a href="/" :aria-current="homeCurrent">Home</a>
-        <a href="/#studios" :aria-current="studiosCurrent">Studios</a>
+        <Link to="IndexPage" :aria-current="homeCurrent">Home</Link>
+        <a href="/#studios" data-vmz-route="IndexPage" :aria-current="studiosCurrent">Studios</a>
       </nav>
 
       <code class="site-header__pkg">@doki-land/fractal</code>
