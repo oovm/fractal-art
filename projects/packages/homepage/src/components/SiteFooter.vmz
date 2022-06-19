@@ -15,7 +15,8 @@
             <li><Link to="FernPage">Fern</Link></li>
             <li><Link to="SierpinskiPage">Sierpiński</Link></li>
             <li><Link to="AttractorPage">Attractor</Link></li>
-            <li><Link to="EscapePage">Escape</Link></li>
+            <li><Link to="MandelbrotPage">Mandelbrot</Link></li>
+            <li><Link to="JuliaPage">Julia</Link></li>
             <li><Link to="LyapunovPage">Lyapunov</Link></li>
             <li><Link to="MelodyPage">Melody</Link></li>
           </ul>

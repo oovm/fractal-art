@@ -1,0 +1,17 @@
+<template>
+  <div class="studio">
+    <StudioRail active="mandelbrot" />
+    <header class="studio__head">
+      <p class="studio__eyebrow">Studio</p>
+      <h1>Mandelbrot set</h1>
+      <p class="studio__lede">
+        Classic escape-time field in the complex plane. Rust WASM samples iterations; TypeScript maps color.
+      </p>
+    </header>
+    <MandelbrotPanel />
+  </div>
+</template>
+
+<script client>
+export default class MandelbrotPage {}
+</script>

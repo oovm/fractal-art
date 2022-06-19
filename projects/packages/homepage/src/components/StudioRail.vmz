@@ -4,7 +4,8 @@
     <Link to="FernPage" :aria-current="active === 'fern' ? 'page' : null">Fern</Link>
     <Link to="SierpinskiPage" :aria-current="active === 'sierpinski' ? 'page' : null">Sierpiński</Link>
     <Link to="AttractorPage" :aria-current="active === 'attractor' ? 'page' : null">Attractor</Link>
-    <Link to="EscapePage" :aria-current="active === 'escape' ? 'page' : null">Escape</Link>
+    <Link to="MandelbrotPage" :aria-current="active === 'mandelbrot' ? 'page' : null">Mandelbrot</Link>
+    <Link to="JuliaPage" :aria-current="active === 'julia' ? 'page' : null">Julia</Link>
     <Link to="LyapunovPage" :aria-current="active === 'lyapunov' ? 'page' : null">Lyapunov</Link>
     <Link to="MelodyPage" :aria-current="active === 'melody' ? 'page' : null">Melody</Link>
   </nav>

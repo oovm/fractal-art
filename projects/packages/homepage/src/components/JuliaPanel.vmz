@@ -1,0 +1,194 @@
+<template>
+  <div class="julia">
+  <Space direction="vertical" size="large">
+    <Space wrap size="middle" class="toolbar">
+      <Field
+        label="Max iter"
+        type="number"
+        min="20"
+        max="240"
+        step="10"
+        :value="maxIterText"
+        description="WASM samples the Julia field for fixed c; TypeScript paints ImageData."
+        @input="onMaxIterInput"
+      />
+      <Field
+        label="Scale"
+        type="number"
+        min="0.5"
+        max="4"
+        step="0.1"
+        :value="scaleText"
+        @input="onScaleInput"
+      />
+      <Field
+        label="c real"
+        type="number"
+        min="-1.5"
+        max="1.5"
+        step="0.01"
+        :value="cxText"
+        @input="onCxInput"
+      />
+      <Field
+        label="c imag"
+        type="number"
+        min="-1.5"
+        max="1.5"
+        step="0.01"
+        :value="cyText"
+        @input="onCyInput"
+      />
+      <Space wrap size="small" class="actions">
+        <Button type="button" @click="redraw">Redraw</Button>
+        <Button type="button" variant="ghost" @click="reset">Reset</Button>
+      </Space>
+    </Space>
+
+    <Callout :tone="calloutTone" :title="calloutTitle" :description="status" />
+
+    <canvas
+      class="canvas"
+      width="480"
+      height="300"
+      role="img"
+      aria-label="Julia set escape-time field"
+    ></canvas>
+
+    <Typography variant="secondary">
+      Julia · c = {{ cx }}, {{ cy }} · {{ width }}×{{ height }} · maxIter {{ maxIter }}
+    </Typography>
+  </Space>
+  </div>
+</template>
+
+<style>
+.toolbar {
+  align-items: flex-end;
+  width: 100%;
+}
+.actions {
+  align-items: center;
+  padding-bottom: 0.15rem;
+}
+.canvas {
+  display: block;
+  height: auto;
+}
+</style>
+
+<script client>
+import { isFractalWasmReady, loadFractalWasm } from "../lib/fractal-wasm.ts";
+import { paintEscapeField, type EscapeField } from "../lib/escape-paint.ts";
+
+export default class JuliaPanel {
+  width = 480;
+  height = 300;
+  maxIter = 80;
+  maxIterText = "80";
+  scale = 3;
+  scaleText = "3";
+  cx = -0.8;
+  cy = 0.156;
+  cxText = "-0.8";
+  cyText = "0.156";
+  status = isFractalWasmReady() ? "Warming canvas…" : "Loading WASM Julia engine…";
+  busy = false;
+  calloutTone = "info";
+  calloutTitle = "Status";
+
+  constructor() {
+    void this.draw();
+  }
+
+  async draw() {
+    if (this.busy) return;
+    this.busy = true;
+    this.calloutTone = "info";
+    this.calloutTitle = "Sampling";
+    this.status = isFractalWasmReady()
+      ? "WASM fills the Julia field; TypeScript paints pixels…"
+      : "Loading WASM Julia engine…";
+    try {
+      const wasm = await loadFractalWasm();
+      const field = wasm.julia(
+        this.width,
+        this.height,
+        0,
+        0,
+        this.scale,
+        this.cx,
+        this.cy,
+        this.maxIter,
+      ) as EscapeField;
+      const canvas = document.querySelector(".julia canvas.canvas") as HTMLCanvasElement | null;
+      if (canvas) paintEscapeField(canvas, field, { hue: 300 });
+      this.calloutTone = "success";
+      this.calloutTitle = `Julia · ${this.width}×${this.height}`;
+      this.status = "Geometry from Rust WASM · color from TypeScript ImageData.";
+    } catch (err) {
+      this.calloutTone = "danger";
+      this.calloutTitle = "Render failed";
+      this.status = err instanceof Error ? err.message : String(err);
+    } finally {
+      this.busy = false;
+    }
+  }
+
+  onMaxIterInput(event: Event) {
+    const target = event.target as HTMLInputElement | null;
+    if (!target) return;
+    const next = Number.parseInt(target.value, 10);
+    if (!Number.isFinite(next) || next < 20 || next > 240) return;
+    this.maxIter = next;
+    this.maxIterText = String(next);
+    void this.draw();
+  }
+
+  onScaleInput(event: Event) {
+    const target = event.target as HTMLInputElement | null;
+    if (!target) return;
+    const next = Number.parseFloat(target.value);
+    if (!Number.isFinite(next) || next < 0.5 || next > 4) return;
+    this.scale = next;
+    this.scaleText = String(next);
+    void this.draw();
+  }
+
+  onCxInput(event: Event) {
+    const target = event.target as HTMLInputElement | null;
+    if (!target) return;
+    const next = Number.parseFloat(target.value);
+    if (!Number.isFinite(next) || next < -1.5 || next > 1.5) return;
+    this.cx = next;
+    this.cxText = String(next);
+    void this.draw();
+  }
+
+  onCyInput(event: Event) {
+    const target = event.target as HTMLInputElement | null;
+    if (!target) return;
+    const next = Number.parseFloat(target.value);
+    if (!Number.isFinite(next) || next < -1.5 || next > 1.5) return;
+    this.cy = next;
+    this.cyText = String(next);
+    void this.draw();
+  }
+
+  redraw() {
+    void this.draw();
+  }
+
+  reset() {
+    this.maxIter = 80;
+    this.maxIterText = "80";
+    this.scale = 3;
+    this.scaleText = "3";
+    this.cx = -0.8;
+    this.cy = 0.156;
+    this.cxText = "-0.8";
+    this.cyText = "0.156";
+    void this.draw();
+  }
+}
+</script>

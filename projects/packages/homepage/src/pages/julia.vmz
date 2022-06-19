@@ -1,0 +1,17 @@
+<template>
+  <div class="studio">
+    <StudioRail active="julia" />
+    <header class="studio__head">
+      <p class="studio__eyebrow">Studio</p>
+      <h1>Julia set</h1>
+      <p class="studio__lede">
+        Escape-time fractal for a fixed complex parameter c. Tune c and zoom; WASM computes, TypeScript paints.
+      </p>
+    </header>
+    <JuliaPanel />
+  </div>
+</template>
+
+<script client>
+export default class JuliaPage {}
+</script>
