@@ -11,6 +11,7 @@
         <div>
           <h2>Studios</h2>
           <ul>
+            <li><Link to="WelcomePage">Welcome</Link></li>
             <li><Link to="TurtlePage">Turtle</Link></li>
             <li><Link to="FernPage">Fern</Link></li>
             <li><Link to="SierpinskiPage">Sierpiński</Link></li>

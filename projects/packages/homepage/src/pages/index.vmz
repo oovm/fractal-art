@@ -1,59 +1,14 @@
 <template>
-  <div class="home">
-    <section class="home__hero" aria-label="Fractal">
-      <div class="home__hero-copy">
-        <h1 class="home__brand">Fractal</h1>
-        <p class="home__lede">
-          Generative studios where Rust grows the geometry and TypeScript paints the page.
-        </p>
-        <div class="home__actions">
-          <Link to="TurtlePage" class="home__cta home__cta--primary">Open a studio</Link>
-          <a href="/#studios" data-vmz-route="IndexPage" class="home__cta home__cta--secondary">Browse studios</a>
-        </div>
-      </div>
-    </section>
-
-    <section id="studios" class="home__studios" aria-labelledby="studios-title">
-      <div class="home__studios-head">
-        <h2 id="studios-title">Studios</h2>
-        <p>One generator per route. Pick a family and stay with the canvas.</p>
-      </div>
-      <div class="home__studio-grid">
-        <Link to="TurtlePage" class="home__studio-link">
-          <strong>Lindenmayer turtle</strong>
-          <span>String rewrite grows a plant path; canvas strokes the trail.</span>
-          <em>/turtle</em>
-        </Link>
-        <Link to="FernPage" class="home__studio-link">
-          <strong>Barnsley fern</strong>
-          <span>IFS chaos game cloud with box and correlation dimensions.</span>
-          <em>/fern</em>
-        </Link>
-        <Link to="SierpinskiPage" class="home__studio-link">
-          <strong>Sierpiński gasket</strong>
-          <span>Generic IFS surface on the same sample engine.</span>
-          <em>/sierpinski</em>
-        </Link>
-        <Link to="AttractorPage" class="home__studio-link">
-          <strong>Strange attractors</strong>
-          <span>Clifford, de Jong, and Lorenz trajectories.</span>
-          <em>/attractor</em>
-        </Link>
-        <Link to="EscapePage" class="home__studio-link">
-          <strong>Escape time</strong>
-          <span>Mandelbrot and Julia fields mapped to ImageData.</span>
-          <em>/escape</em>
-        </Link>
-        <Link to="LyapunovPage" class="home__studio-link">
-          <strong>Logistic Lyapunov</strong>
-          <span>λ(r) scan for the classic chaos diagram.</span>
-          <em>/lyapunov</em>
-        </Link>
-        <Link to="MelodyPage" class="home__studio-link">
-          <strong>L-system melody</strong>
-          <span>Note events through Web Audio and MIDI export.</span>
-          <em>/melody</em>
-        </Link>
+  <div class="landing">
+    <section class="landing__card" aria-label="Fractal Art">
+      <p class="landing__eyebrow">Fractal Art</p>
+      <h1 class="landing__title">Generative studios</h1>
+      <p class="landing__lede">
+        Rust computes geometry. TypeScript paints, plays, and exports. Start in a studio or tour the welcome page.
+      </p>
+      <div class="landing__actions">
+        <Link to="TurtlePage" class="landing__cta landing__cta--primary">Open a studio</Link>
+        <Link to="WelcomePage" class="landing__cta landing__cta--secondary">Welcome</Link>
       </div>
     </section>
   </div>

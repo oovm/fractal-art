@@ -8,7 +8,8 @@
 
       <nav class="site-nav" aria-label="Primary">
         <Link to="IndexPage" :aria-current="homeCurrent">Home</Link>
-        <a href="/#studios" data-vmz-route="IndexPage" :aria-current="studiosCurrent">Studios</a>
+        <Link to="WelcomePage" :aria-current="welcomeCurrent">Welcome</Link>
+        <a href="/welcome#studios" data-vmz-route="WelcomePage" :aria-current="studiosCurrent">Studios</a>
       </nav>
 
       <code class="site-header__pkg">@doki-land/fractal</code>
@@ -17,8 +18,20 @@
 </template>
 
 <script client>
+const STUDIO_PREFIXES = [
+  "/turtle",
+  "/fern",
+  "/sierpinski",
+  "/attractor",
+  "/mandelbrot",
+  "/julia",
+  "/lyapunov",
+  "/melody",
+];
+
 export default class SiteHeader {
   homeCurrent: string | null = null;
+  welcomeCurrent: string | null = null;
   studiosCurrent: string | null = null;
 
   onMount() {
@@ -33,7 +46,10 @@ export default class SiteHeader {
     if (!pathname) return;
     const path = pathname.replace(/\/$/, "") || "/";
     this.homeCurrent = path === "/" ? "page" : null;
-    this.studiosCurrent = path !== "/" ? "page" : null;
+    this.welcomeCurrent = path === "/welcome" ? "page" : null;
+    this.studiosCurrent = STUDIO_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))
+      ? "page"
+      : null;
   }
 }
 </script>

@@ -1,0 +1,69 @@
+<template>
+  <div class="welcome">
+    <section class="welcome__hero" aria-label="Fractal">
+      <div class="welcome__hero-copy">
+        <h1 class="welcome__brand">Fractal</h1>
+        <p class="welcome__lede">
+          Generative studios where Rust grows the geometry and TypeScript paints the page.
+        </p>
+        <div class="welcome__actions">
+          <Link to="TurtlePage" class="welcome__cta welcome__cta--primary">Open a studio</Link>
+          <a href="/welcome#studios" data-vmz-route="WelcomePage" class="welcome__cta welcome__cta--secondary">Browse studios</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="studios" class="welcome__studios" aria-labelledby="studios-title">
+      <div class="welcome__studios-head">
+        <h2 id="studios-title">Studios</h2>
+        <p>One generator per route. Pick a family and stay with the canvas.</p>
+      </div>
+      <div class="welcome__studio-grid">
+        <Link to="TurtlePage" class="welcome__studio-link">
+          <strong>Lindenmayer turtle</strong>
+          <span>String rewrite grows a plant path; canvas strokes the trail.</span>
+          <em>/turtle</em>
+        </Link>
+        <Link to="FernPage" class="welcome__studio-link">
+          <strong>Barnsley fern</strong>
+          <span>IFS chaos game cloud with box and correlation dimensions.</span>
+          <em>/fern</em>
+        </Link>
+        <Link to="SierpinskiPage" class="welcome__studio-link">
+          <strong>Sierpiński gasket</strong>
+          <span>Generic IFS surface on the same sample engine.</span>
+          <em>/sierpinski</em>
+        </Link>
+        <Link to="AttractorPage" class="welcome__studio-link">
+          <strong>Strange attractors</strong>
+          <span>Clifford, de Jong, and Lorenz trajectories.</span>
+          <em>/attractor</em>
+        </Link>
+        <Link to="MandelbrotPage" class="welcome__studio-link">
+          <strong>Mandelbrot set</strong>
+          <span>Classic escape-time field in the complex plane.</span>
+          <em>/mandelbrot</em>
+        </Link>
+        <Link to="JuliaPage" class="welcome__studio-link">
+          <strong>Julia set</strong>
+          <span>Escape-time fractal for a fixed complex parameter c.</span>
+          <em>/julia</em>
+        </Link>
+        <Link to="LyapunovPage" class="welcome__studio-link">
+          <strong>Logistic Lyapunov</strong>
+          <span>λ(r) scan for the classic chaos diagram.</span>
+          <em>/lyapunov</em>
+        </Link>
+        <Link to="MelodyPage" class="welcome__studio-link">
+          <strong>L-system melody</strong>
+          <span>Note events through Web Audio and MIDI export.</span>
+          <em>/melody</em>
+        </Link>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script client>
+export default class WelcomePage {}
+</script>
