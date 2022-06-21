@@ -89,6 +89,7 @@ function paintLyapunovScan(canvas: HTMLCanvasElement, scan: LyapunovScan) {
   const stage = css.getPropertyValue("--vmz-surface-stage").trim() || "#0b1f1c";
   const accent = css.getPropertyValue("--vmz-brand-energy").trim() || "#e11d48";
   const zero = css.getPropertyValue("--vmz-scale-700").trim() || "#0f766e";
+  const ink = css.getPropertyValue("--vmz-text-on-ink").trim() || "#f0fdfa";
 
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = stage;
