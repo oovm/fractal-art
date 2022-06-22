@@ -75,38 +75,70 @@ function midiToHz(midi: number): number {
   return 440 * 2 ** ((midi - 69) / 12);
 }
 
+const MAX_PLAY_EVENTS = 96;
+const MAX_PLAY_MS = 12_000;
+
 /** TS playback: schedule oscillators from Rust note events (no PCM from WASM). */
-async function playMelody(melody: Melody, gain = 0.18): Promise<void> {
+async function playMelody(melody: Melody, gain = 0.18): Promise<{ played: number; truncated: boolean }> {
+  const events = Array.isArray(melody?.events) ? melody.events : [];
+  if (events.length === 0) return { played: 0, truncated: false };
+
   const AudioCtx =
     window.AudioContext ||
     (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!AudioCtx) throw new Error("Web Audio API unavailable");
+
   const ctx = new AudioCtx();
-  const master = ctx.createGain();
-  master.gain.value = gain;
-  master.connect(ctx.destination);
-  const t0 = ctx.currentTime + 0.05;
-  let end = t0;
-  for (const e of melody.events) {
-    const start = t0 + Math.max(0, e.time);
-    const dur = Math.max(0.02, e.duration);
-    const stop = start + dur;
-    end = Math.max(end, stop);
-    const osc = ctx.createOscillator();
-    const g = ctx.createGain();
-    osc.type = "sine";
-    osc.frequency.value = midiToHz(e.midi);
-    const vel = Math.min(1, Math.max(0, e.velocity)) * gain;
-    g.gain.setValueAtTime(0, start);
-    g.gain.linearRampToValueAtTime(vel, start + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, stop);
-    osc.connect(g);
-    g.connect(master);
-    osc.start(start);
-    osc.stop(stop + 0.02);
+  try {
+    if (ctx.state === "suspended") {
+      await ctx.resume();
+    }
+    const master = ctx.createGain();
+    master.gain.value = gain;
+    master.connect(ctx.destination);
+
+    const clipped = events.slice(0, MAX_PLAY_EVENTS);
+    const truncated = clipped.length < events.length;
+    const t0 = ctx.currentTime + 0.05;
+    let end = t0;
+
+    for (const e of clipped) {
+      const start = t0 + Math.max(0, Number(e.time) || 0);
+      const dur = Math.max(0.02, Number(e.duration) || 0.02);
+      const stop = start + dur;
+      if (!Number.isFinite(start) || !Number.isFinite(stop)) continue;
+      end = Math.max(end, stop);
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = midiToHz(Number(e.midi) || 60);
+      const vel = Math.min(1, Math.max(0.001, Number(e.velocity) || 0.5)) * gain;
+      g.gain.setValueAtTime(0.0001, start);
+      g.gain.exponentialRampToValueAtTime(vel, start + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, Math.max(start + 0.03, stop));
+      osc.connect(g);
+      g.connect(master);
+      osc.start(start);
+      osc.stop(stop + 0.02);
+    }
+
+    const waitMs = Math.min(
+      MAX_PLAY_MS,
+      Math.max(0, Math.ceil((end - ctx.currentTime) * 1000) + 40),
+    );
+    await new Promise<void>((resolve) => {
+      const timer = window.setTimeout(resolve, waitMs);
+      // If the tab suspends timers oddly, still unlock via audio end approx.
+      void timer;
+    });
+    return { played: clipped.length, truncated };
+  } finally {
+    try {
+      await ctx.close();
+    } catch {
+      /* ignore close races */
+    }
   }
-  await new Promise((r) => setTimeout(r, Math.ceil((end - ctx.currentTime) * 1000) + 50));
-  await ctx.close();
 }
 
 function writeVarLen(value: number, out: number[]): void {
@@ -177,15 +209,20 @@ export default class MelodyPanel {
     this.busy = true;
     this.calloutTone = "info";
     this.calloutTitle = "Playing";
-    this.status = "WASM builds the score; TypeScript schedules oscillators…";
+    this.status = isFractalWasmReady()
+      ? "Scheduling oscillators…"
+      : "Loading WASM melody engine…";
     try {
       const wasm = await loadFractalWasm();
-      const melody = wasm.growMelody(this.iterations, this.tempo, this.seedMidi);
-      this.noteCount = melody.count;
-      await playMelody(melody);
+      const melody = wasm.growMelody(this.iterations, this.tempo, this.seedMidi) as Melody;
+      this.noteCount = melody?.count ?? melody?.events?.length ?? 0;
+      this.status = `Playing ${this.noteCount} note events…`;
+      const result = await playMelody(melody);
       this.calloutTone = "success";
-      this.calloutTitle = `Melody · ${melody.count} notes`;
-      this.status = "Note events from Rust WASM · playback from TypeScript Web Audio.";
+      this.calloutTitle = `Melody · ${this.noteCount} notes`;
+      this.status = result.truncated
+        ? `Played first ${result.played} of ${this.noteCount} notes (capped). WASM events · Web Audio.`
+        : "Note events from Rust WASM · playback from TypeScript Web Audio.";
     } catch (err) {
       this.calloutTone = "danger";
       this.calloutTitle = "Playback failed";
@@ -253,6 +290,7 @@ export default class MelodyPanel {
   }
 
   reset() {
+    this.busy = false;
     this.iterations = 3;
     this.iterationsText = "3";
     this.tempo = 120;

@@ -106,15 +106,19 @@ export function toMidiBytes(
     return Uint8Array.from(header);
 }
 
+const MAX_PLAY_EVENTS = 256;
+const MAX_PLAY_MS = 30_000;
+
 /**
  * Schedule `NoteEvent`s on a Web Audio context (browser only).
- * Returns when the last note ends (approx).
+ * Resumes a suspended context, caps event count / wait, and always closes the context.
  */
 export async function playMelody(
     melody: MelodyLike | NoteEventLike[],
     options: PlayMelodyOptions = {},
 ): Promise<void> {
-    const events = Array.isArray(melody) ? melody : melody.events;
+    const raw = Array.isArray(melody) ? melody : melody?.events;
+    const events = Array.isArray(raw) ? raw : [];
     if (events.length === 0) {
         return;
     }
@@ -128,33 +132,49 @@ export async function playMelody(
         throw new Error("Web Audio API unavailable");
     }
     const ctx = new AudioCtx();
-    const master = ctx.createGain();
-    master.gain.value = options.gain ?? 0.2;
-    master.connect(ctx.destination);
-    const oscType = options.type ?? "sine";
-    const t0 = ctx.currentTime + 0.05;
-    let end = t0;
+    try {
+        if (ctx.state === "suspended") {
+            await ctx.resume();
+        }
+        const master = ctx.createGain();
+        const gainLevel = options.gain ?? 0.2;
+        master.gain.value = gainLevel;
+        master.connect(ctx.destination);
+        const oscType = options.type ?? "sine";
+        const clipped = events.slice(0, MAX_PLAY_EVENTS);
+        const t0 = ctx.currentTime + 0.05;
+        let end = t0;
 
-    for (const e of events) {
-        const start = t0 + Math.max(0, e.time);
-        const dur = Math.max(0.02, e.duration);
-        const stop = start + dur;
-        end = Math.max(end, stop);
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = oscType;
-        osc.frequency.value = midiToHz(e.midi);
-        const vel = Math.min(1, Math.max(0, e.velocity)) * (options.gain ?? 0.2);
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(vel, start + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.0001, stop);
-        osc.connect(gain);
-        gain.connect(master);
-        osc.start(start);
-        osc.stop(stop + 0.02);
+        for (const e of clipped) {
+            const start = t0 + Math.max(0, Number(e.time) || 0);
+            const dur = Math.max(0.02, Number(e.duration) || 0.02);
+            const stop = start + dur;
+            if (!Number.isFinite(start) || !Number.isFinite(stop)) continue;
+            end = Math.max(end, stop);
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = oscType;
+            osc.frequency.value = midiToHz(Number(e.midi) || 60);
+            const vel = Math.min(1, Math.max(0.001, Number(e.velocity) || 0.5)) * gainLevel;
+            gain.gain.setValueAtTime(0.0001, start);
+            gain.gain.exponentialRampToValueAtTime(vel, start + 0.015);
+            gain.gain.exponentialRampToValueAtTime(0.0001, Math.max(start + 0.03, stop));
+            osc.connect(gain);
+            gain.connect(master);
+            osc.start(start);
+            osc.stop(stop + 0.02);
+        }
+
+        const waitMs = Math.min(
+            MAX_PLAY_MS,
+            Math.max(0, Math.ceil((end - ctx.currentTime) * 1000) + 50),
+        );
+        await new Promise((r) => setTimeout(r, waitMs));
+    } finally {
+        try {
+            await ctx.close();
+        } catch {
+            /* ignore close races */
+        }
     }
-
-    const waitMs = Math.ceil((end - ctx.currentTime) * 1000) + 50;
-    await new Promise((r) => setTimeout(r, waitMs));
-    await ctx.close();
 }
