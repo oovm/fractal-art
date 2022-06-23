@@ -4,7 +4,7 @@
       <div>
         <p class="site-footer__brand">Fractal</p>
         <p class="site-footer__blurb">
-          Math generates geometry in Rust. TypeScript paints, plays, and exports.
+          Generative studios for L-systems, IFS, attractors, escape sets, and melody.
         </p>
       </div>
       <div class="site-footer__cols">
@@ -26,7 +26,7 @@
     </div>
     <div class="site-footer__bar">
       <p>© {{ year }} Fractal Art</p>
-      <p class="site-footer__mono">Rust compute · TS present</p>
+      <p class="site-footer__mono">@doki-land/fractal</p>
     </div>
   </footer>
 </template>
