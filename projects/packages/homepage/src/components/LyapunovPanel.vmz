@@ -36,7 +36,7 @@
       </Space>
     </Space>
 
-    <Callout :tone="calloutTone" :title="calloutTitle" :description="status" />
+    <Callout v-if="status" :tone="calloutTone" :title="calloutTitle" :description="status" />
 
     <canvas
       class="canvas"
@@ -69,7 +69,7 @@
 </style>
 
 <script client>
-import { isFractalWasmReady, loadFractalWasm } from "../lib/fractal-wasm.ts";
+import { applyWasmLoadCallout, loadFractalWasm } from "../lib/fractal-wasm.ts";
 
 type LyapunovScan = {
   rMin: number;
@@ -143,10 +143,10 @@ export default class LyapunovPanel {
   rMax = 4.0;
   rMaxText = "4";
   lamText = "—";
-  status = isFractalWasmReady() ? "Warming canvas…" : "Loading WASM Lyapunov engine…";
+  status = "";
   busy = false;
   calloutTone = "info";
-  calloutTitle = "Status";
+  calloutTitle = "";
 
   constructor() {
     void this.draw();
@@ -155,9 +155,7 @@ export default class LyapunovPanel {
   async draw() {
     if (this.busy) return;
     this.busy = true;
-    this.calloutTone = "info";
-    this.calloutTitle = "Scanning";
-    this.status = "WASM estimates λ(r); TypeScript paints the curve…";
+    applyWasmLoadCallout(this);
     try {
       const wasm = await loadFractalWasm();
       const scan = wasm.logisticLyapunovScan(this.rMin, this.rMax, this.steps, 1500, 150);

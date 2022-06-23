@@ -72,6 +72,31 @@ export function isFractalWasmReady(): boolean {
   return resolved !== null;
 }
 
+export const FRACTAL_WASM_LOADING = "Loading…";
+
+/** True until the shared WASM module has finished its first init. */
+export function needsWasmLoadUi(): boolean {
+  return resolved === null;
+}
+
+type WasmLoadCalloutTarget = {
+  calloutTone: string;
+  calloutTitle: string;
+  status: string;
+};
+
+/** Show a loading callout only while WASM is still cold-starting. */
+export function applyWasmLoadCallout(target: WasmLoadCalloutTarget): void {
+  if (needsWasmLoadUi()) {
+    target.calloutTone = "info";
+    target.calloutTitle = "Loading";
+    target.status = FRACTAL_WASM_LOADING;
+    return;
+  }
+  target.status = "";
+  target.calloutTitle = "";
+}
+
 export function loadFractalWasm(): Promise<FractalWasm> {
   if (!ready) {
     ready = import(/* @vite-ignore */ WASM_JS).then(async (mod: FractalWasm) => {

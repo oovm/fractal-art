@@ -35,7 +35,7 @@
       </Space>
     </Space>
 
-    <Callout :tone="calloutTone" :title="calloutTitle" :description="status" />
+    <Callout v-if="status" :tone="calloutTone" :title="calloutTitle" :description="status" />
 
     <Typography variant="secondary">
       Notes: {{ noteCount }} · Tempo: {{ tempo }} BPM · Root MIDI: {{ seedMidi }}
@@ -56,7 +56,7 @@
 </style>
 
 <script client>
-import { isFractalWasmReady, loadFractalWasm } from "../lib/fractal-wasm.ts";
+import { applyWasmLoadCallout, loadFractalWasm } from "../lib/fractal-wasm.ts";
 
 type NoteEvent = {
   time: number;
@@ -200,18 +200,14 @@ export default class MelodyPanel {
   seedText = "60";
   noteCount = 0;
   busy = false;
-  status = "Ready. Click Play to sample WASM events and hear Web Audio.";
+  status = "";
   calloutTone = "info";
-  calloutTitle = "Status";
+  calloutTitle = "";
 
   async play() {
     if (this.busy) return;
     this.busy = true;
-    this.calloutTone = "info";
-    this.calloutTitle = "Playing";
-    this.status = isFractalWasmReady()
-      ? "Scheduling oscillators…"
-      : "Loading WASM melody engine…";
+    applyWasmLoadCallout(this);
     try {
       const wasm = await loadFractalWasm();
       const melody = wasm.growMelody(this.iterations, this.tempo, this.seedMidi) as Melody;
@@ -235,11 +231,12 @@ export default class MelodyPanel {
   async downloadMidi() {
     if (this.busy) return;
     this.busy = true;
-    this.calloutTone = "info";
-    this.calloutTitle = "Exporting";
-    this.status = "WASM builds events; TypeScript encodes SMF…";
+    applyWasmLoadCallout(this);
     try {
       const wasm = await loadFractalWasm();
+      this.calloutTone = "info";
+      this.calloutTitle = "Exporting";
+      this.status = "Encoding SMF…";
       const melody = wasm.growMelody(this.iterations, this.tempo, this.seedMidi);
       this.noteCount = melody.count;
       const bytes = toMidiBytes(melody, this.tempo);
@@ -299,8 +296,8 @@ export default class MelodyPanel {
     this.seedText = "60";
     this.noteCount = 0;
     this.calloutTone = "info";
-    this.calloutTitle = "Status";
-    this.status = "Ready. Click Play to sample WASM events and hear Web Audio.";
+    this.calloutTitle = "";
+    this.status = "";
   }
 }
 </script>

@@ -26,7 +26,7 @@
       </Space>
     </Space>
 
-    <Callout :tone="calloutTone" :title="calloutTitle" :description="status" />
+    <Callout v-if="status" :tone="calloutTone" :title="calloutTitle" :description="status" />
 
     <canvas
       class="canvas"
@@ -59,7 +59,7 @@
 </style>
 
 <script client>
-import { isFractalWasmReady, loadFractalWasm } from "../lib/fractal-wasm.ts";
+import { applyWasmLoadCallout, loadFractalWasm } from "../lib/fractal-wasm.ts";
 
 type Point2 = { x: number; y: number };
 
@@ -143,13 +143,13 @@ export default class SierpinskiPanel {
   samplesText = "40000";
   seed = 3;
   seedText = "3";
-  status = isFractalWasmReady() ? "Warming canvas…" : "Loading WASM IFS engine…";
+  status = "";
   pointCount = 0;
   dimText = "—";
   corrText = "—";
   busy = false;
   calloutTone = "info";
-  calloutTitle = "Status";
+  calloutTitle = "";
 
   constructor() {
     void this.draw();
@@ -167,9 +167,7 @@ export default class SierpinskiPanel {
   async draw() {
     if (this.busy) return;
     this.busy = true;
-    this.calloutTone = "info";
-    this.calloutTitle = "Sampling";
-    this.status = "WASM samples the gasket; TypeScript plots the point cloud…";
+    applyWasmLoadCallout(this);
     try {
       const wasm = await loadFractalWasm();
       const result = wasm.growSierpinski(this.samples, this.seed);

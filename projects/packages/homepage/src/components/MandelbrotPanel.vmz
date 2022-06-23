@@ -27,7 +27,7 @@
       </Space>
     </Space>
 
-    <Callout :tone="calloutTone" :title="calloutTitle" :description="status" />
+    <Callout v-if="status" :tone="calloutTone" :title="calloutTitle" :description="status" />
 
     <canvas
       class="canvas"
@@ -60,7 +60,7 @@
 </style>
 
 <script client>
-import { isFractalWasmReady, loadFractalWasm } from "../lib/fractal-wasm.ts";
+import { applyWasmLoadCallout, loadFractalWasm } from "../lib/fractal-wasm.ts";
 import { paintEscapeField, type EscapeField } from "../lib/escape-paint.ts";
 
 export default class MandelbrotPanel {
@@ -70,10 +70,10 @@ export default class MandelbrotPanel {
   maxIterText = "80";
   scale = 3;
   scaleText = "3";
-  status = isFractalWasmReady() ? "Warming canvas…" : "Loading WASM Mandelbrot engine…";
+  status = "";
   busy = false;
   calloutTone = "info";
-  calloutTitle = "Status";
+  calloutTitle = "";
 
   constructor() {
     void this.draw();
@@ -82,11 +82,7 @@ export default class MandelbrotPanel {
   async draw() {
     if (this.busy) return;
     this.busy = true;
-    this.calloutTone = "info";
-    this.calloutTitle = "Sampling";
-    this.status = isFractalWasmReady()
-      ? "WASM fills the Mandelbrot field; TypeScript paints pixels…"
-      : "Loading WASM Mandelbrot engine…";
+    applyWasmLoadCallout(this);
     try {
       const wasm = await loadFractalWasm();
       const field = wasm.mandelbrot(

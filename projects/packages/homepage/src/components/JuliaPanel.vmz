@@ -45,7 +45,7 @@
       </Space>
     </Space>
 
-    <Callout :tone="calloutTone" :title="calloutTitle" :description="status" />
+    <Callout v-if="status" :tone="calloutTone" :title="calloutTitle" :description="status" />
 
     <canvas
       class="canvas"
@@ -78,7 +78,7 @@
 </style>
 
 <script client>
-import { isFractalWasmReady, loadFractalWasm } from "../lib/fractal-wasm.ts";
+import { applyWasmLoadCallout, loadFractalWasm } from "../lib/fractal-wasm.ts";
 import { paintEscapeField, type EscapeField } from "../lib/escape-paint.ts";
 
 export default class JuliaPanel {
@@ -92,10 +92,10 @@ export default class JuliaPanel {
   cy = 0.156;
   cxText = "-0.8";
   cyText = "0.156";
-  status = isFractalWasmReady() ? "Warming canvas…" : "Loading WASM Julia engine…";
+  status = "";
   busy = false;
   calloutTone = "info";
-  calloutTitle = "Status";
+  calloutTitle = "";
 
   constructor() {
     void this.draw();
@@ -104,11 +104,7 @@ export default class JuliaPanel {
   async draw() {
     if (this.busy) return;
     this.busy = true;
-    this.calloutTone = "info";
-    this.calloutTitle = "Sampling";
-    this.status = isFractalWasmReady()
-      ? "WASM fills the Julia field; TypeScript paints pixels…"
-      : "Loading WASM Julia engine…";
+    applyWasmLoadCallout(this);
     try {
       const wasm = await loadFractalWasm();
       const field = wasm.julia(

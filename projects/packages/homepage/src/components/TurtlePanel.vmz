@@ -17,7 +17,7 @@
       </Space>
     </Space>
 
-    <Callout :tone="calloutTone" :title="calloutTitle" :description="status" />
+    <Callout v-if="status" :tone="calloutTone" :title="calloutTitle" :description="status" />
 
     <canvas
       class="canvas"
@@ -50,7 +50,7 @@
 </style>
 
 <script client>
-import { isFractalWasmReady, loadFractalWasm } from "../lib/fractal-wasm.ts";
+import { applyWasmLoadCallout, loadFractalWasm } from "../lib/fractal-wasm.ts";
 
 type Point2 = { x: number; y: number };
 
@@ -125,12 +125,12 @@ function strokeCanvas(
 export default class TurtlePanel {
   iterations = 3;
   iterationsText = "3";
-  status = isFractalWasmReady() ? "Warming canvas…" : "Loading WASM plant engine…";
+  status = "";
   sourceLength = 0;
   pointCount = 0;
   busy = false;
   calloutTone = "info";
-  calloutTitle = "Status";
+  calloutTitle = "";
 
   constructor() {
     void this.draw();
@@ -148,11 +148,7 @@ export default class TurtlePanel {
   async draw() {
     if (this.busy) return;
     this.busy = true;
-    this.calloutTone = "info";
-    this.calloutTitle = "Growing";
-    this.status = isFractalWasmReady()
-      ? "WASM computes turtle points; TypeScript strokes the canvas…"
-      : "Loading WASM plant engine…";
+    applyWasmLoadCallout(this);
     try {
       const wasm = await loadFractalWasm();
       const result = wasm.growPlant(this.iterations, 8, 25);
