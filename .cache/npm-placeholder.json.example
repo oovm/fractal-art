@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "trust_expect": {
+    "repo": "oovm/fractal-art",
+    "file": "publish-npm.yml",
+    "env": "NPM_PUBLISH"
+  },
+  "packages": {}
+}

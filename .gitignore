@@ -31,3 +31,7 @@ projects/crates/fractal-wasm/pkg-node/
 # Browser WASM (regenerate with `pnpm build:wasm`)
 projects/crates/fractal-wasm/pkg-web/
 projects/packages/homepage/public/wasm/
+
+# Nifty placeholder publish / trust (secrets + live cache)
+.env.placeholder.local
+.cache/npm-placeholder.json
