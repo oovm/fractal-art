@@ -17,7 +17,7 @@ export type {
     Point2,
     PointCloud,
 } from "./native.ts";
-export { loadFractalNative } from "./native.ts";
+export { loadFractalBinding, loadFractalNative } from "./native.ts";
 export {
     fitBounds,
     paintEscapeField,

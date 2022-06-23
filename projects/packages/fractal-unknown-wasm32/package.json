@@ -1,0 +1,11 @@
+{
+    "name": "@doki-land/fractal-unknown-wasm32",
+    "version": "0.0.0",
+    "description": "Fractal WASM bindings for browser / wasm32 — same surface as @doki-land/fractal-<platform> NAPI",
+    "type": "module",
+    "license": "MPL-2.0",
+    "main": "./index.js",
+    "files": ["index.js", "lib", "readme.md"],
+    "cpu": ["wasm32"],
+    "publishConfig": { "access": "public" }
+}

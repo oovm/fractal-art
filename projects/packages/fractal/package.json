@@ -27,7 +27,8 @@
         "@doki-land/fractal-darwin-x64": "workspace:*",
         "@doki-land/fractal-linux-arm64": "workspace:*",
         "@doki-land/fractal-linux-x64": "workspace:*",
-        "@doki-land/fractal-win32-x64": "workspace:*"
+        "@doki-land/fractal-win32-x64": "workspace:*",
+        "@doki-land/fractal-unknown-wasm32": "workspace:*"
     },
     "engines": {
         "node": ">=18"

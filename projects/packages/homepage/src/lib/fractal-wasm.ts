@@ -1,11 +1,16 @@
-/** Shared browser WASM handle — one init for the whole SPA session. */
+/**
+ * Shared browser WASM handle — one init for the whole SPA session.
+ * Delegates to `@doki-land/fractal-unknown-wasm32` (same surface as NAPI platform packages).
+ */
+
+import type { Affine2, EscapeField, LyapunovScan, Melody, PlantPath, PointCloud } from "@doki-land/fractal";
 
 export type FractalWasm = {
-  default: (input?: RequestInfo | URL | Response | BufferSource | WebAssembly.Module) => Promise<unknown>;
-  growPlant: (iterations: number, step: number, turnDegrees: number) => any;
-  growFern: (iterations: number, seed: number) => any;
-  growSierpinski: (iterations: number, seed: number) => any;
-  sampleIfs: (maps: unknown, iterations: number, seed: number, burnIn: number) => any;
+  rewrite: (axiom: string, rules: string[], iterations: number) => string;
+  growPlant: (iterations: number, step: number, turnDegrees: number) => PlantPath;
+  growFern: (iterations: number, seed: number) => PointCloud;
+  growSierpinski: (iterations: number, seed: number) => PointCloud;
+  sampleIfs: (maps: Affine2[], iterations: number, seed: number, burnIn: number) => PointCloud;
   sampleClifford: (
     a: number,
     b: number,
@@ -13,7 +18,7 @@ export type FractalWasm = {
     d: number,
     iterations: number,
     burnIn: number,
-  ) => any;
+  ) => PointCloud;
   sampleDejong: (
     a: number,
     b: number,
@@ -21,7 +26,7 @@ export type FractalWasm = {
     d: number,
     iterations: number,
     burnIn: number,
-  ) => any;
+  ) => PointCloud;
   sampleLorenz: (
     sigma: number,
     rho: number,
@@ -30,7 +35,7 @@ export type FractalWasm = {
     iterations: number,
     burnIn: number,
     plane: string,
-  ) => any;
+  ) => PointCloud;
   mandelbrot: (
     width: number,
     height: number,
@@ -38,7 +43,7 @@ export type FractalWasm = {
     centerY: number,
     scale: number,
     maxIter: number,
-  ) => any;
+  ) => EscapeField;
   julia: (
     width: number,
     height: number,
@@ -48,7 +53,7 @@ export type FractalWasm = {
     cx: number,
     cy: number,
     maxIter: number,
-  ) => any;
+  ) => EscapeField;
   logisticLyapunov: (r: number, iterations: number, burnIn: number) => number | null;
   logisticLyapunovScan: (
     rMin: number,
@@ -56,14 +61,11 @@ export type FractalWasm = {
     steps: number,
     iterations: number,
     burnIn: number,
-  ) => any;
-  growMelody: (iterations: number, tempoBpm: number, seedMidi: number) => any;
+  ) => LyapunovScan | null;
+  growMelody: (iterations: number, tempoBpm: number, seedMidi: number) => Melody;
   boxCountingDimension: (points: unknown, minBoxes: number) => number | null;
   correlationDimension: (points: unknown, maxPoints: number) => number | null;
 };
-
-const WASM_JS = "/wasm/fractal_wasm.js";
-const WASM_BIN = "/wasm/fractal_wasm_bg.wasm";
 
 let ready: Promise<FractalWasm> | null = null;
 let resolved: FractalWasm | null = null;
@@ -99,10 +101,9 @@ export function applyWasmLoadCallout(target: WasmLoadCalloutTarget): void {
 
 export function loadFractalWasm(): Promise<FractalWasm> {
   if (!ready) {
-    ready = import(/* @vite-ignore */ WASM_JS).then(async (mod: FractalWasm) => {
-      await mod.default(WASM_BIN);
-      resolved = mod;
-      return mod;
+    ready = import("@doki-land/fractal-unknown-wasm32").then((mod) => {
+      resolved = mod.default as FractalWasm;
+      return resolved;
     });
   }
   return ready;

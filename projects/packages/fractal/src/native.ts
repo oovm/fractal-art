@@ -163,16 +163,56 @@ const PLATFORM_PACKAGES: Record<string, string> = {
     "linux-arm64": "@doki-land/fractal-linux-arm64",
     "darwin-x64": "@doki-land/fractal-darwin-x64",
     "darwin-arm64": "@doki-land/fractal-darwin-arm64",
+    "unknown-wasm32": "@doki-land/fractal-unknown-wasm32",
 };
 
+function platformKey(): string {
+    if (typeof process === "undefined" || !process.platform || !process.arch) {
+        return "unknown-wasm32";
+    }
+    const key = `${process.platform}-${process.arch}`;
+    if (key in PLATFORM_PACKAGES) {
+        return key;
+    }
+    if (process.arch === "wasm32") {
+        return "unknown-wasm32";
+    }
+    return key;
+}
+
 let cached: FractalBinding | undefined;
+let wasmCached: FractalBinding | undefined;
+let wasmReady: Promise<FractalBinding> | undefined;
+
+/** Load NAPI or WASM binding — isomorphic compute surface for Node and browser. */
+export async function loadFractalBinding(): Promise<FractalBinding> {
+    const key = platformKey();
+    if (key === "unknown-wasm32") {
+        if (wasmCached) {
+            return wasmCached;
+        }
+        if (!wasmReady) {
+            wasmReady = import("@doki-land/fractal-unknown-wasm32").then((mod) => {
+                wasmCached = mod.default as FractalBinding;
+                return wasmCached;
+            });
+        }
+        return wasmReady;
+    }
+    return loadFractalNative();
+}
 
 /** Load the platform Node-API binary from `@doki-land/fractal-<platform>`. */
 export function loadFractalNative(): FractalBinding {
     if (cached) {
         return cached;
     }
-    const key = `${process.platform}-${process.arch}`;
+    const key = platformKey();
+    if (key === "unknown-wasm32") {
+        throw new Error(
+            "Fractal WASM bindings are async on wasm32 — call `loadFractalBinding()` instead of `loadFractalNative()`.",
+        );
+    }
     const pkg = PLATFORM_PACKAGES[key];
     if (!pkg) {
         throw new Error(`Unsupported platform for Fractal native bindings: ${key}`);

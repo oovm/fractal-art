@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const crateDir = join(root, "projects/crates/fractal-wasm");
 const homepagePublic = join(root, "projects/packages/homepage/public/wasm");
+const wasm32Lib = join(root, "projects/packages/fractal-unknown-wasm32/lib");
 const staging = join(crateDir, "pkg-web");
 
 rmSync(staging, { recursive: true, force: true });
@@ -28,3 +29,9 @@ mkdirSync(homepagePublic, { recursive: true });
 cpSync(join(staging, "fractal_wasm.js"), join(homepagePublic, "fractal_wasm.js"));
 cpSync(join(staging, "fractal_wasm_bg.wasm"), join(homepagePublic, "fractal_wasm_bg.wasm"));
 console.log(`homepage public wasm -> ${homepagePublic}`);
+
+rmSync(wasm32Lib, { recursive: true, force: true });
+mkdirSync(wasm32Lib, { recursive: true });
+cpSync(join(staging, "fractal_wasm.js"), join(wasm32Lib, "fractal_wasm.js"));
+cpSync(join(staging, "fractal_wasm_bg.wasm"), join(wasm32Lib, "fractal_wasm_bg.wasm"));
+console.log(`@doki-land/fractal-unknown-wasm32 lib -> ${wasm32Lib}`);

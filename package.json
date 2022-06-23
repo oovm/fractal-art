@@ -20,12 +20,14 @@
         "reset": "git reset Head~ --soft",
         "u": "nifty update",
         "bump": "nifty bump",
+        "placeholder:publish": "node scripts/publish-placeholder.mjs",
         "publish": "nifty publish",
-        "trust": "nifty trust"
+        "trust": "node scripts/trust-placeholder.mjs"
     },
     "devDependencies": {
         "@doki-land/fractal": "workspace:*",
         "@doki-land/fractal-win32-x64": "workspace:*",
+        "@doki-land/fractal-unknown-wasm32": "workspace:*",
         "@doki-land/nifty": "^0.0.8",
         "@napi-rs/cli": "^2.18.4"
     }

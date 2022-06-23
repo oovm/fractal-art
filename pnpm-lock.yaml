@@ -11,6 +11,9 @@ importers:
       '@doki-land/fractal':
         specifier: workspace:*
         version: link:projects/packages/fractal
+      '@doki-land/fractal-unknown-wasm32':
+        specifier: workspace:*
+        version: link:projects/packages/fractal-unknown-wasm32
       '@doki-land/fractal-win32-x64':
         specifier: workspace:*
         version: link:projects/packages/fractal-win32-x64
@@ -42,6 +45,9 @@ importers:
       '@doki-land/fractal-linux-x64':
         specifier: workspace:*
         version: link:../fractal-linux-x64
+      '@doki-land/fractal-unknown-wasm32':
+        specifier: workspace:*
+        version: link:../fractal-unknown-wasm32
       '@doki-land/fractal-win32-x64':
         specifier: workspace:*
         version: link:../fractal-win32-x64
@@ -54,6 +60,8 @@ importers:
 
   projects/packages/fractal-linux-x64: {}
 
+  projects/packages/fractal-unknown-wasm32: {}
+
   projects/packages/fractal-win32-x64: {}
 
   projects/packages/homepage:
@@ -61,6 +69,9 @@ importers:
       '@doki-land/fractal':
         specifier: workspace:*
         version: link:../fractal
+      '@doki-land/fractal-unknown-wasm32':
+        specifier: workspace:*
+        version: link:../fractal-unknown-wasm32
       '@vmz/core':
         specifier: 0.1.32
         version: 0.1.32

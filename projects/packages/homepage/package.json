@@ -12,6 +12,7 @@
     },
     "dependencies": {
         "@doki-land/fractal": "workspace:*",
+        "@doki-land/fractal-unknown-wasm32": "workspace:*",
         "@vmz/core": "0.1.32",
         "@vmz/ui": "0.1.32"
     },
