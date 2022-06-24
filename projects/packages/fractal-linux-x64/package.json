@@ -1,12 +1,21 @@
 {
     "name": "@doki-land/fractal-linux-x64",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "description": "Fractal Node-API binary for Linux x64 (GNU)",
     "type": "module",
     "license": "MPL-2.0",
     "main": "./index.js",
-    "files": ["index.js", "lib"],
-    "os": ["linux"],
-    "cpu": ["x64"],
-    "publishConfig": { "access": "public" }
+    "files": [
+        "index.js",
+        "lib"
+    ],
+    "os": [
+        "linux"
+    ],
+    "cpu": [
+        "x64"
+    ],
+    "publishConfig": {
+        "access": "public"
+    }
 }

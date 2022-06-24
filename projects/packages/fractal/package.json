@@ -1,6 +1,6 @@
 {
     "name": "@doki-land/fractal",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "description": "Fractal / L-system engine — Node facade over @doki-land/fractal-<platform>",
     "type": "module",
     "license": "MPL-2.0",
@@ -14,7 +14,9 @@
             "default": "./src/index.ts"
         }
     },
-    "files": ["src"],
+    "files": [
+        "src"
+    ],
     "scripts": {
         "typecheck": "tsc --noEmit",
         "test": "node --test --experimental-strip-types tests/render.test.ts tests/native.test.ts tests/audio.test.ts",
