@@ -1,0 +1,209 @@
+# Trusted Publisher contract (sole npm trusted workflow — keep this filename):
+#   file = publish-npm.yml
+#   repo = oovm/fractal-art
+#   env  = NPM_PUBLISH
+
+name: Publish npm
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Must match existing git tag vX.Y.Z (retry only)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  provenance:
+    name: Bind version ↔ tag ↔ commit
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.bind.outputs.version }}
+      sha: ${{ steps.bind.outputs.sha }}
+      tag: ${{ steps.bind.outputs.tag }}
+    steps:
+      - name: Checkout (for tag fetch)
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Bind publish tag
+        id: bind
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: node scripts/ci/bind-publish-tag.mjs
+
+      - name: Require green CI on tag commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_SHA: ${{ steps.bind.outputs.sha }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          CI_WORKFLOW_FILE: rust.yml
+        run: node scripts/ci/require-ci-success.mjs --sha=${{ steps.bind.outputs.sha }}
+
+  build-native:
+    name: Native ${{ matrix.short }}
+    needs: provenance
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            short: win32-x64
+            lib: projects/packages/fractal-win32-x64/lib
+          - os: ubuntu-latest
+            short: linux-x64
+            lib: projects/packages/fractal-linux-x64/lib
+          - os: macos-latest
+            short: darwin-arm64
+            lib: projects/packages/fractal-darwin-arm64/lib
+    steps:
+      - name: Checkout tag peel
+        uses: actions/checkout@v5
+        with:
+          ref: refs/tags/${{ needs.provenance.outputs.tag }}
+          fetch-depth: 0
+
+      - name: Verify HEAD is bound tag SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          head="$(git rev-parse HEAD)"
+          want="${{ needs.provenance.outputs.sha }}"
+          if [[ "$head" != "$want" ]]; then
+            echo "Refusing native build: HEAD=$head != bound tag sha=$want" >&2
+            exit 1
+          fi
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: publish-native-${{ matrix.short }}
+          cache-on-failure: true
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build Node-API addon
+        run: pnpm run build:napi
+
+      - name: Upload native .node artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-${{ matrix.short }}
+          path: ${{ matrix.lib }}
+          if-no-files-found: error
+
+  publish:
+    name: Publish packages
+    needs: [provenance, build-native]
+    runs-on: ubuntu-latest
+    environment: NPM_PUBLISH
+    steps:
+      - name: Checkout tag peel
+        uses: actions/checkout@v5
+        with:
+          ref: refs/tags/${{ needs.provenance.outputs.tag }}
+          fetch-depth: 0
+
+      - name: Verify HEAD is bound tag SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          head="$(git rev-parse HEAD)"
+          want="${{ needs.provenance.outputs.sha }}"
+          if [[ "$head" != "$want" ]]; then
+            echo "Refusing publish: HEAD=$head != bound tag sha=$want" >&2
+            exit 1
+          fi
+          echo "publishing ${{ needs.provenance.outputs.tag }} @ $head"
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          package-manager-cache: false
+          registry-url: https://registry.npmjs.org
+
+      - name: Ensure npm supports Trusted Publishing
+        run: npm install -g npm@latest
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Download native artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: native-*
+          path: dist/native-artifacts
+
+      - name: Normalize artifact layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist/native-flat
+          for d in dist/native-artifacts/native-* dist/native-artifacts/*; do
+            [[ -d "$d" ]] || continue
+            base="$(basename "$d")"
+            short="${base#native-}"
+            mkdir -p "dist/native-flat/$short"
+            cp -r "$d"/. "dist/native-flat/$short/" || true
+          done
+          find dist/native-flat -type f -print
+          for short in win32-x64 linux-x64 darwin-arm64; do
+            if ! find "dist/native-flat/$short" -name 'fractal*.node' -type f | grep -q .; then
+              echo "missing native binary for $short under dist/native-flat" >&2
+              exit 1
+            fi
+          done
+
+      - name: Build browser WASM
+        run: pnpm run build:wasm
+
+      - name: Strip token-style npmrc (OIDC only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          unset NODE_AUTH_TOKEN NPM_TOKEN || true
+          for file in "${HOME}/.npmrc" "${NPM_CONFIG_USERCONFIG:-}" "${RUNNER_TEMP:-}/.npmrc"; do
+            [[ -n "${file}" && -f "${file}" ]] || continue
+            if grep -q '_authToken' "${file}"; then
+              grep -v '_authToken' "${file}" > "${file}.oidc" && mv "${file}.oidc" "${file}"
+              echo "stripped _authToken from ${file}"
+            fi
+          done
+
+      - name: Publish packages to npm
+        env:
+          FRACTAL_NATIVE_ARTIFACTS: ${{ github.workspace }}/dist/native-flat
+          GITHUB_REF: refs/tags/v${{ needs.provenance.outputs.version }}
+        run: node scripts/ci/publish-npm.mjs --version=${{ needs.provenance.outputs.version }}
