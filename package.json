@@ -20,9 +20,11 @@
         "reset": "git reset Head~ --soft",
         "u": "nifty update",
         "bump": "nifty bump",
-        "placeholder:publish": "node scripts/publish-placeholder.mjs",
+        "placeholder": "node scripts/ci/publish-placeholder.mjs",
+        "placeholder:publish": "node scripts/ci/publish-placeholder.mjs publish",
+        "placeholder:trust": "node scripts/ci/publish-placeholder.mjs trust",
         "publish": "nifty publish",
-        "trust": "node scripts/trust-placeholder.mjs"
+        "trust": "node scripts/ci/publish-placeholder.mjs trust"
     },
     "devDependencies": {
         "@doki-land/fractal": "workspace:*",
