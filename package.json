@@ -22,9 +22,8 @@
         "bump": "nifty bump",
         "placeholder": "node scripts/ci/publish-placeholder.mjs",
         "placeholder:publish": "node scripts/ci/publish-placeholder.mjs publish",
-        "placeholder:trust": "node scripts/ci/publish-placeholder.mjs trust",
         "publish": "nifty publish",
-        "trust": "node scripts/ci/publish-placeholder.mjs trust"
+        "trust": "nifty trust"
     },
     "devDependencies": {
         "@doki-land/fractal": "workspace:*",
