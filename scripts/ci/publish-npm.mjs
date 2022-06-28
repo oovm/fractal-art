@@ -140,7 +140,7 @@ function rewriteDepsField(pkg, version) {
 }
 
 function isAlreadyPublished(blob) {
-    return /cannot publish over existing|EPUBLISHCONFLICT|previously published|version already exists|cannot publish.*same version|you cannot publish over/i.test(
+    return /cannot publish over existing|EPUBLISHCONFLICT|previously published|version already exists|cannot publish.*same version|you cannot publish over|previously staged version/i.test(
         blob,
     );
 }

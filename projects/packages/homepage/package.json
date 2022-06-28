@@ -1,6 +1,6 @@
 {
     "name": "homepage",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "private": true,
     "type": "module",
     "description": "Fractal demo site — VMZ host shell over @doki-land/fractal WASM",

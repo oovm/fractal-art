@@ -1,7 +1,7 @@
 [package]
 name = "fractal-napi"
 publish = false
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Aster <192607617@qq.com>"]
 description = "Node-API bindings for @doki-land/fractal"
 repository = "https://github.com/oovm/fractal-art"

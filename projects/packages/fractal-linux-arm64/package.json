@@ -1,6 +1,6 @@
 {
     "name": "@doki-land/fractal-linux-arm64",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Fractal Node-API binary for Linux arm64 (GNU)",
     "type": "module",
     "license": "MPL-2.0",
