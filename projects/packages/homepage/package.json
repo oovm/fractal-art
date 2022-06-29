@@ -11,8 +11,8 @@
         "clean": "rimraf dist"
     },
     "dependencies": {
-        "@doki-land/fractal": "workspace:*",
-        "@doki-land/fractal-unknown-wasm32": "workspace:*",
+        "@doki-land/fractal": "0.0.2",
+        "@doki-land/fractal-unknown-wasm32": "0.0.2",
         "@vmz/core": "0.1.32",
         "@vmz/ui": "0.1.32"
     },
