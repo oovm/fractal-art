@@ -215,9 +215,13 @@ function promoteLatestTag(name, version) {
         return true;
     }
     if (isAuthFailure(blob)) {
-        fail(`OIDC/auth failed promoting latest for ${name}`);
+        console.warn(
+            ` ! ${name} latest promote skipped: OIDC publish token cannot dist-tag (run locally: npm dist-tag add ${name}@${version} latest)`,
+        );
+        return false;
     }
-    fail(`dist-tag latest failed for ${name}@${version}\n${blob.slice(0, 1200)}`);
+    console.warn(` ! ${name} latest promote failed (non-fatal)\n${blob.slice(0, 800)}`);
+    return false;
 }
 
 function promotePlatformLatestTags(version) {
