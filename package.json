@@ -20,8 +20,10 @@
         "reset": "git reset Head~ --soft",
         "u": "nifty update",
         "bump": "nifty bump",
-        "placeholder": "node scripts/ci/publish-placeholder.mjs",
-        "placeholder:publish": "node scripts/ci/publish-placeholder.mjs publish",
+        "placeholder": "nifty publish --placeholder --dry-run",
+        "placeholder:publish": "nifty publish --placeholder",
+        "placeholder:trust": "nifty trust",
+        "promote:latest": "node scripts/ci/promote-platform-latest.mjs",
         "publish": "nifty publish",
         "trust": "nifty trust"
     },
@@ -29,7 +31,7 @@
         "@doki-land/fractal": "workspace:*",
         "@doki-land/fractal-win32-x64": "workspace:*",
         "@doki-land/fractal-unknown-wasm32": "workspace:*",
-        "@doki-land/nifty": "^0.0.8",
+        "@doki-land/nifty": "^0.0.11",
         "@napi-rs/cli": "^2.18.4"
     }
 }

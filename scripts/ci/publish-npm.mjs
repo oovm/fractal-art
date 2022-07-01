@@ -166,9 +166,8 @@ function versionExists(name, version) {
 /**
  * @returns {"published"|"exists"|"auth"|"missing"|"other"}
  */
-function npmPublish(stagingDir, name, version, opts = {}) {
-    const args = ["publish", "--access", "public"];
-    if (opts.npmTag) args.push("--tag", opts.npmTag);
+function npmPublish(stagingDir, name, version) {
+    const args = ["publish", "--access", "public", "--tag", "latest"];
     console.log(`\n=== ${name}@${version} npm ${args.join(" ")} ===`);
     const r = run("npm", args, { cwd: stagingDir });
     if (r.stdout) process.stdout.write(`${r.stdout}\n`);
@@ -181,59 +180,6 @@ function npmPublish(stagingDir, name, version, opts = {}) {
     if (versionExists(name, version)) return "exists";
     console.error(blob.slice(0, 1200));
     return "other";
-}
-
-function latestDistTagVersion(name) {
-    const r = run("npm", ["dist-tag", "ls", name, "--json"]);
-    if (r.status !== 0 || !r.stdout) return null;
-    try {
-        const tags = JSON.parse(r.stdout);
-        const latest = tags?.latest;
-        return typeof latest === "string" && latest.length > 0 ? latest : null;
-    } catch {
-        return null;
-    }
-}
-
-function promoteLatestTag(name, version) {
-    if (!versionExists(name, version)) {
-        console.log(` · ${name}@${version} not on registry — skip latest promote`);
-        return false;
-    }
-    const current = latestDistTagVersion(name);
-    if (current === version) {
-        console.log(` ✓ ${name} latest already ${version}`);
-        return true;
-    }
-    console.log(`\n=== ${name}@${version} npm dist-tag add latest (was ${current ?? "?"}) ===`);
-    const r = run("npm", ["dist-tag", "add", `${name}@${version}`, "latest"]);
-    if (r.stdout) process.stdout.write(`${r.stdout}\n`);
-    if (r.stderr) process.stderr.write(`${r.stderr}\n`);
-    const blob = `${r.stdout}\n${r.stderr}`;
-    if (r.status === 0 || latestDistTagVersion(name) === version) {
-        console.log(` ✓ ${name} latest → ${version}`);
-        return true;
-    }
-    if (isAuthFailure(blob)) {
-        console.warn(
-            ` ! ${name} latest promote skipped: OIDC publish token cannot dist-tag (run locally: npm dist-tag add ${name}@${version} latest)`,
-        );
-        return false;
-    }
-    console.warn(` ! ${name} latest promote failed (non-fatal)\n${blob.slice(0, 800)}`);
-    return false;
-}
-
-function promotePlatformLatestTags(version) {
-    const names = [
-        ...NATIVE_PLATFORMS.map((plat) => `@doki-land/fractal-${plat.short}`),
-        WASM_PACKAGE.name,
-    ];
-    let promoted = 0;
-    for (const name of names) {
-        if (promoteLatestTag(name, version)) promoted += 1;
-    }
-    return promoted;
 }
 
 function findNodeInArtifact(artDir, wantFile) {
@@ -451,8 +397,10 @@ const artifactsRoot = process.env.FRACTAL_NATIVE_ARTIFACTS || path.join(ROOT, "d
 const native = publishNative(version, artifactsRoot);
 const wasm = publishWasm(version);
 const facade = publishFacade(version, artifactsRoot, wasm.published > 0 || wasm.skipped > 0);
-const latestPromoted = promotePlatformLatestTags(version);
 
 console.log(
-    `\nci-publish-npm: done (native published=${native.published} skipped=${native.skipped}; wasm published=${wasm.published} skipped=${wasm.skipped}; facade published=${facade.published} skipped=${facade.skipped}; latest promoted=${latestPromoted})`,
+    `\nci-publish-npm: done (native published=${native.published} skipped=${native.skipped}; wasm published=${wasm.published} skipped=${wasm.skipped}; facade published=${facade.published} skipped=${facade.skipped})`,
+);
+console.log(
+    "  if platform latest still points at 0.0.0 after OIDC publish, run: pnpm promote:latest -- <version>",
 );
