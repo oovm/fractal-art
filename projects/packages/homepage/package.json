@@ -8,6 +8,7 @@
         "check": "vmz check .",
         "dev": "vmz dev .",
         "build": "vmz build . --release --profile static",
+        "deploy:cf": "npx wrangler@3 pages deploy dist/cdn",
         "clean": "rimraf dist"
     },
     "dependencies": {

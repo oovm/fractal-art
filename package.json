@@ -16,6 +16,7 @@
         "fmt:check": "nifty format --check",
         "fmt:rs": "cargo fmt --all",
         "dev:web": "pnpm --filter homepage dev",
+        "deploy:web": "pnpm --filter homepage build && pnpm --filter homepage deploy:cf",
         "p": "git push && git push --tags --prune",
         "reset": "git reset Head~ --soft",
         "u": "nifty update",

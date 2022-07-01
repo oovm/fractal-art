@@ -1,0 +1,7 @@
+# Cloudflare Pages — local / CI deploy target for VMZ static profile (`dist/cdn`).
+# Dashboard: Build output directory = projects/packages/homepage/dist/cdn
+# GitHub Actions: .github/workflows/deploy-homepage.yml
+
+name = "fractal-art"
+compatibility_date = "2024-09-30"
+pages_build_output_dir = "./dist/cdn"
