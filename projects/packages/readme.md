@@ -1,6 +1,6 @@
 # packages
 
-npm workspace members — same split as `npm-tools` / Nifty.
+npm workspace members — same split as Nifty (`npm-tools`).
 
 | Path | Role |
 |------|------|
@@ -10,6 +10,9 @@ npm workspace members — same split as `npm-tools` / Nifty.
 | `fractal-linux-arm64/` | Platform Node-API |
 | `fractal-darwin-x64/` | Platform Node-API |
 | `fractal-darwin-arm64/` | Platform Node-API |
-| `homepage/` | Demo site (VMZ + browser WASM) |
+| `fractal-unknown-wasm32/` | Browser / wasm32 binding |
+| `homepage/` | Demo site (VMZ + WASM) |
 
-Build platform binaries with `pnpm build:napi`. Manage the repo with `nifty` (`pnpm fmt` / `bump` / `publish` / `trust`).
+Build platform `.node` binaries with `pnpm build:napi`. Refresh browser WASM with `pnpm build:wasm`.
+
+Repo tooling: `nifty` (`pnpm fmt`, `bump`, `publish`, `trust`).

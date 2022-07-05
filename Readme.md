@@ -121,9 +121,12 @@ console.log(scan?.steps, scan?.values[0]);
 ## Web (homepage)
 
 ```bash
-pnpm build:wasm
 pnpm dev:web
 ```
+
+Static production build: `pnpm --filter homepage build` → `projects/packages/homepage/dist/cdn`.
+
+Cloudflare Pages: connect the Git repo in the dashboard (build command and output path are documented in `projects/packages/homepage/readme.md`). No Wrangler or extra CI workflow is required.
 
 ## Nifty
 
