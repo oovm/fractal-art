@@ -31,7 +31,7 @@
         "@doki-land/fractal": "workspace:*",
         "@doki-land/fractal-win32-x64": "workspace:*",
         "@doki-land/fractal-unknown-wasm32": "workspace:*",
-        "@doki-land/nifty": "^0.0.11",
+        "@doki-land/nifty": "^0.0.12",
         "@napi-rs/cli": "^2.18.4"
     }
 }
