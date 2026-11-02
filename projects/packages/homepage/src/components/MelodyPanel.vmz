@@ -78,6 +78,10 @@ function midiToHz(midi: number): number {
 const MAX_PLAY_EVENTS = 96;
 const MAX_PLAY_MS = 12_000;
 
+type WebkitAudioWindow = {
+  webkitAudioContext: typeof AudioContext | undefined;
+};
+
 /** TS playback: schedule oscillators from Rust note events (no PCM from WASM). */
 async function playMelody(melody: Melody, gain = 0.18): Promise<{ played: number; truncated: boolean }> {
   const events = Array.isArray(melody?.events) ? melody.events : [];
@@ -85,7 +89,7 @@ async function playMelody(melody: Melody, gain = 0.18): Promise<{ played: number
 
   const AudioCtx =
     window.AudioContext ||
-    (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    (window as unknown as WebkitAudioWindow).webkitAudioContext;
   if (!AudioCtx) throw new Error("Web Audio API unavailable");
 
   const ctx = new AudioCtx();

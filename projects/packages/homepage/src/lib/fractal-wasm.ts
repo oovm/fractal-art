@@ -102,7 +102,8 @@ export function applyWasmLoadCallout(target: WasmLoadCalloutTarget): void {
 export function loadFractalWasm(): Promise<FractalWasm> {
   if (!ready) {
     ready = import("@doki-land/fractal-unknown-wasm32").then((mod) => {
-      resolved = mod.default as FractalWasm;
+      const binding = mod.default;
+      resolved = binding;
       return resolved;
     });
   }

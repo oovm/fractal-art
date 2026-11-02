@@ -13,11 +13,13 @@
     "dependencies": {
         "@doki-land/fractal": "0.0.2",
         "@doki-land/fractal-unknown-wasm32": "0.0.2",
-        "@vmz/core": "0.1.32",
-        "@vmz/ui": "0.1.32"
+        "@vmz/core": "0.3.12",
+        "@vmz/plugin": "0.3.12",
+        "@vmz/ui": "0.3.12",
+        "@vmz/ui-icons": "0.3.12"
     },
     "devDependencies": {
-        "@vmz/vmz": "0.1.32",
+        "@vmz/vmz": "0.3.12",
         "rimraf": "^6.0.1"
     }
 }

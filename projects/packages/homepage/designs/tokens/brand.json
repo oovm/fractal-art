@@ -20,15 +20,21 @@
         "paper": "#FBFEFD",
         "mist": "#F0F7F5",
         "page": "#E8F2EF",
+        "fill": "#F0F7F5",
         "ink": "#0B1F1C",
         "graphite": "#3D524E",
+        "code": "#0B1F1C",
+        "inverse": "#0B1F1C",
         "stage": "#0B1F1C"
     },
     "text": {
         "ink": "#0B1F1C",
         "steel": "#5C736E",
+        "tertiary": "#5C736E",
+        "muted": "#5C736E",
         "on-brand": "#FBFEFD",
-        "on-ink": "#F0FDFA"
+        "on-ink": "#F0FDFA",
+        "on-inverse": "#F0FDFA"
     },
     "line": {
         "default": "#C5D9D4",
