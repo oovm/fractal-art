@@ -4,7 +4,7 @@
  * OIDC Trusted Publisher can publish tarballs but cannot dist-tag on some packages.
  * Run locally after a tag publish when CI logs show 401 on dist-tag add.
  *
- * Reads NPM_TOTP_SECRET / NPM_OTP from .env.placeholder.local (same as nifty trust).
+ * Reads npmTotpSecret / npmOtp from .secrets/nifty.json (same as nifty trust).
  *
  * Usage:
  *   node scripts/ci/promote-platform-latest.mjs 0.0.2
@@ -18,7 +18,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const ENV_PATH = path.join(ROOT, ".env.placeholder.local");
+const SECRETS_PATH = path.join(ROOT, ".secrets", "nifty.json");
 
 const PLATFORM_PACKAGES = [
     "@doki-land/fractal-win32-x64",
@@ -31,25 +31,16 @@ const PLATFORM_PACKAGES = [
 
 const LEGACY_TAGS = /^release-\d+\.\d+\.\d+/;
 
-function loadLocalEnv(filePath) {
+function loadSecretsFile(filePath) {
     /** @type {Record<string, string>} */
-    const out = {};
+    let text;
     try {
-        for (const raw of fs.readFileSync(filePath, "utf8").split(/\r?\n/)) {
-            const line = raw.trim();
-            if (!line || line.startsWith("#")) continue;
-            const m = line.match(/^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
-            if (!m) continue;
-            let v = m[2].trim();
-            if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
-                v = v.slice(1, -1);
-            }
-            out[m[1]] = v;
-        }
-    } catch {
-        /* optional */
+        text = fs.readFileSync(filePath, "utf8");
+    } catch (err) {
+        if (err.code === "ENOENT") return {};
+        throw err;
     }
-    return out;
+    return JSON.parse(text);
 }
 
 function decodeBase32(secret) {
@@ -85,13 +76,14 @@ function totpCode(secret) {
     return String(code % 1_000_000).padStart(6, "0");
 }
 
-const localEnv = loadLocalEnv(ENV_PATH);
-const totpSecret = process.env.NPM_TOTP_SECRET ?? localEnv.NPM_TOTP_SECRET;
-const staticOtp = process.env.NPM_OTP ?? localEnv.NPM_OTP;
+const secrets = loadSecretsFile(SECRETS_PATH);
+const isSixDigit = (v) => typeof v === "string" && /^\d{6}$/.test(v.trim());
+const totpSecret = secrets.npmTotpSecret ?? (!isSixDigit(secrets.npmOtp) ? secrets.npmOtp : undefined);
+const staticOtp = isSixDigit(secrets.npmOtp) ? secrets.npmOtp : undefined;
 const otp = totpSecret ? totpCode(totpSecret) : staticOtp;
 
 if (!otp) {
-    console.error("promote-platform-latest: set NPM_TOTP_SECRET in .env.placeholder.local");
+    console.error("promote-platform-latest: set npmTotpSecret in .secrets/nifty.json");
     process.exit(1);
 }
 

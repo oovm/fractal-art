@@ -35,3 +35,7 @@ projects/packages/homepage/public/wasm/
 # Nifty placeholder publish / trust (secrets + live cache)
 .env.placeholder.local
 .cache/npm-placeholder.json
+
+# npm secrets (nifty)
+.secrets/*
+!.secrets/nifty.json.example

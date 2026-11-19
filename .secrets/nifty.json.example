@@ -1,0 +1,4 @@
+{
+    "npmToken": "npm_xxxxxxxxxxxxxxxxxxxx",
+    "npmTotpSecret": "BASE32AUTHENTICATORSECRET"
+}
